@@ -149,3 +149,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# To check the data
+# python src/check_dataset.py --data data/blocks_world_easy.jsonl
+# python src/check_dataset.py --data data/blocks_world_medium.jsonl
+# python src/check_dataset.py --data data/blocks_world_hard.jsonl
