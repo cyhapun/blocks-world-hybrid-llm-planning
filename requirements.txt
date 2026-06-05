@@ -1,0 +1,8 @@
+pyperplan
+openai
+python-dotenv
+pandas
+numpy
+matplotlib
+streamlit
+tqdm
