@@ -220,3 +220,23 @@ results/raw_outputs/
 results/metrics.csv
 results/figures/
 ```
+
+## Symbolic Planner
+
+Convert JSONL problem to PDDL:
+
+```bash
+python src/json_to_pddl.py --input data/blocks_world_easy.jsonl --index 0
+```
+
+Run pyperplan:
+
+```bash
+python src/run_planner.py --problem pddl/problems/bw_easy_001.pddl
+```
+
+Validate generated plan:
+
+```bash
+python src/validate_plan.py --problem-id bw_easy_001 --plan results/example_plan.txt
+```

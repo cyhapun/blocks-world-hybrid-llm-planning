@@ -1,7 +1,7 @@
 import argparse
 import json
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
-
+from pathlib import Path
 
 Atom = Tuple[str, ...]
 State = Set[Atom]
@@ -129,6 +129,12 @@ def normalize_action(action: Any) -> Tuple[Optional[str], Optional[List[str]], O
 
     if isinstance(action, str):
         text = action.strip()
+
+        if "(" in text and text.endswith(")") and not text.startswith("("):
+            name = text[:text.index("(")].strip()
+            inner = text[text.index("(") + 1:-1].strip()
+            args = [arg.strip() for arg in inner.replace(",", " ").split() if arg.strip()]
+            return name, args, None
 
         if text.startswith("(") and text.endswith(")"):
             text = text[1:-1].strip()
@@ -434,17 +440,75 @@ def run_demo() -> None:
 
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
+def load_problem_by_id(problem_id: str, data_dir: str = "data") -> Dict[str, Any]:
+    for path in Path(data_dir).glob("*.jsonl"):
+        with path.open("r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+
+                record = json.loads(line)
+
+                if record.get("id") == problem_id:
+                    return record
+
+    raise FileNotFoundError(f"Problem id '{problem_id}' not found in {data_dir}/*.jsonl")
+
+
+def load_plan_actions(plan_path: str) -> List[List[str]]:
+    actions = []
+
+    with Path(plan_path).open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+
+            if not line or line.startswith(";"):
+                continue
+
+            name, args, error = normalize_action(line)
+
+            if error:
+                raise ValueError(error)
+
+            assert name is not None
+            assert args is not None
+
+            actions.append([name] + [arg.upper() for arg in args])
+
+    return actions
+
+
+def run_problem_plan_validation(problem_id: str, plan_path: str, data_dir: str = "data") -> None:
+    problem = load_problem_by_id(problem_id, data_dir=data_dir)
+    actions = load_plan_actions(plan_path)
+
+    result = validate_plan(
+        initial_state=problem["initial_state"],
+        goal=problem["goal"],
+        actions=actions,
+        objects=problem["objects"],
+    )
+
+    print(json.dumps(result, indent=2, ensure_ascii=False))
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--demo", action="store_true", help="Run demo validation")
+    parser.add_argument("--problem-id", default=None, help="Problem id from dataset")
+    parser.add_argument("--plan", default=None, help="Path to plan text file")
+    parser.add_argument("--data-dir", default="data", help="Dataset directory")
     args = parser.parse_args()
 
     if args.demo:
         run_demo()
+    elif args.problem_id and args.plan:
+        run_problem_plan_validation(
+            problem_id=args.problem_id,
+            plan_path=args.plan,
+            data_dir=args.data_dir,
+        )
     else:
         parser.print_help()
-
 
 if __name__ == "__main__":
     main()
