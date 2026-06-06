@@ -1,52 +1,177 @@
-# Blocks World LLM Planning Evaluation
+# Demo Blocks World LLM + Symbolic Planner
 
-A lightweight framework for evaluating LLM-based planning on Blocks World tasks. The project includes a PDDL domain, JSONL problem datasets, plan validation, planner integration, evaluation utilities, visualization, and an optional Streamlit interface.
+Dự án này đánh giá khả năng lập kế hoạch trên các bài toán Blocks World bằng hai cách tiếp cận:
 
-## Project Structure
+1. **LLM-only**: mô hình ngôn ngữ trực tiếp tạo kế hoạch hành động từ một nhiệm vụ bằng ngôn ngữ tự nhiên.
+2. **LLM + symbolic planner**: mô hình ngôn ngữ phân tích nhiệm vụ ngôn ngữ tự nhiên thành JSON có cấu trúc, backend chuyển JSON thành PDDL, và `pyperplan` tạo kế hoạch cuối cùng.
+
+Demo chính tập trung vào cách tiếp cận thứ hai:
 
 ```text
-blocks-world-hybrid-llm-planing
+Natural language task
+→ LLM parser
+→ JSON / PDDL
+→ pyperplan
+→ plan
+→ validator
+→ metrics + visualization
+```
+
+## 1. Kiến trúc hệ thống
+
+```text
+data/*.jsonl
+  ↓
+natural_language
+  ↓
+LLM
+  ├── LLM-only: direct action plan
+  └── LLM + planner: structured JSON
+          ↓
+      JSON to PDDL
+          ↓
+      pyperplan
+          ↓
+        plan
+          ↓
+    validate_plan.py
+          ↓
+  results/metrics.csv
+          ↓
+  visualization + Streamlit demo
+```
+
+Các thành phần chính:
+
+| Component | Purpose |
+|---|---|
+| `data/*.jsonl` | Các bài toán benchmark Blocks World |
+| `pddl/domain_blocks_world.pddl` | Domain PDDL cho Blocks World |
+| `src/validate_plan.py` | Bộ kiểm tra kế hoạch nội bộ |
+| `src/json_to_pddl.py` | Chuyển đổi bài toán JSON sang PDDL |
+| `src/run_planner.py` | Chạy `pyperplan` |
+| `src/llm_only_baseline.py` | Chạy lập kế hoạch LLM-only |
+| `src/llm_to_json.py` | Chạy lập kế hoạch LLM-to-JSON-to-PDDL |
+| `src/evaluate.py` | Trình chạy đánh giá thống nhất |
+| `src/visualize.py` | Tạo hình kết quả |
+| `src/render_plan.py` | Render các trace kế hoạch định tính |
+| `app/streamlit_app.py` | Ứng dụng demo tương tác |
+
+## 2. Cấu trúc repository
+
+```text
+.
 ├── README.md
 ├── requirements.txt
 ├── config.yaml
+├── .env.example
 ├── data/
 │   ├── blocks_world_easy.jsonl
 │   ├── blocks_world_medium.jsonl
 │   └── blocks_world_hard.jsonl
+├── docs/
+│   ├── demo_design.md
+│   ├── metrics.md
+│   ├── experiment_protocol.md
+│   └── troubleshooting.md
 ├── pddl/
 │   ├── domain_blocks_world.pddl
+│   ├── problems/
 │   └── generated_problems/
 ├── src/
 │   ├── generate_dataset.py
 │   ├── check_dataset.py
-│   ├── llm_baseline.py
+│   ├── llm_client.py
+│   ├── llm_only_baseline.py
 │   ├── llm_to_json.py
 │   ├── json_to_pddl.py
 │   ├── run_planner.py
 │   ├── validate_plan.py
 │   ├── evaluate.py
-│   └── visualize.py
-├── tests/
-│   └── test_validator.py
+│   ├── visualize.py
+│   └── render_plan.py
 ├── results/
 │   ├── raw_outputs/
+│   ├── plans/
 │   ├── metrics.csv
 │   └── figures/
+├── tests/
+│   └── test_validator.py
 └── app/
     └── streamlit_app.py
 ```
 
-## Setup
+## 3. Thiết lập môi trường
+
+Tạo và kích hoạt môi trường dự án.
+
+Sử dụng conda:
 
 ```bash
+conda create -n blocks-world-llm python=3.11 -y
+conda activate blocks-world-llm
 pip install -r requirements.txt
 ```
 
-## Dataset
+Hoặc sử dụng venv:
 
-Blocks World tasks are stored as JSONL files under `data/`.
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-Each line contains one problem instance:
+Kiểm tra cài đặt:
+
+```bash
+python -m py_compile src/validate_plan.py src/evaluate.py app/streamlit_app.py
+pytest tests/test_validator.py
+```
+
+## 4. Cấu hình API
+
+Dự án hỗ trợ hai backend LLM:
+
+| Backend | Mô tả |
+|---|---|
+| `hf` | Hugging Face Inference API |
+| `local` | API local tương thích OpenAI |
+
+Tạo file môi trường cục bộ:
+
+```bash
+cp .env.example .env
+```
+
+Ví dụ `.env`:
+
+```env
+LLM_MODE=hf
+
+HF_TOKEN=your_huggingface_token_here
+HF_MODEL=Qwen/Qwen2.5-7B-Instruct
+
+LOCAL_LLM_BASE_URL=http://localhost:8000/v1
+LOCAL_LLM_API_KEY=local-token
+LOCAL_LLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+
+LLM_TEMPERATURE=0.0
+LLM_MAX_TOKENS=512
+```
+
+Không commit `.env`.
+
+## 5. Dataset
+
+Các file dataset:
+
+```text
+data/blocks_world_easy.jsonl
+data/blocks_world_medium.jsonl
+data/blocks_world_hard.jsonl
+```
+
+Mỗi dòng là một bài toán JSON:
 
 ```json
 {
@@ -68,15 +193,7 @@ Each line contains one problem instance:
 }
 ```
 
-Dataset files:
-
-```text
-data/blocks_world_easy.jsonl
-data/blocks_world_medium.jsonl
-data/blocks_world_hard.jsonl
-```
-
-Validate dataset files:
+Xác thực dataset:
 
 ```bash
 python src/check_dataset.py --data data/blocks_world_easy.jsonl
@@ -84,222 +201,28 @@ python src/check_dataset.py --data data/blocks_world_medium.jsonl
 python src/check_dataset.py --data data/blocks_world_hard.jsonl
 ```
 
-## PDDL Domain
+## 6. Chạy từng phương pháp riêng lẻ
 
-The Blocks World domain is defined in:
-
-```text
-pddl/domain_blocks_world.pddl
-```
-
-Supported actions:
-
-```text
-pick-up(x)
-put-down(x)
-stack(x, y)
-unstack(x, y)
-```
-
-Core predicates:
-
-```text
-on(x, y)
-on_table(x)
-clear(x)
-holding(x)
-handempty
-```
-
-## Plan Validator
-
-The validator is implemented in:
-
-```text
-src/validate_plan.py
-```
-
-It simulates Blocks World actions, checks preconditions, applies effects, and verifies final goal satisfaction.
-
-Run demo:
+### LLM-only
 
 ```bash
-python src/validate_plan.py --demo
+python src/llm_only_baseline.py --data data/blocks_world_easy.jsonl --limit 3
 ```
 
-Example result:
-
-```json
-{
-  "valid": true,
-  "goal_achieved": true,
-  "failed_step": null,
-  "error_type": null,
-  "reason": "Plan is valid and goal is achieved."
-}
-```
-
-Possible error types include:
-
-```text
-invalid_problem
-invalid_action_format
-unknown_action
-invalid_action
-unknown_object
-precondition_violation
-goal_not_achieved
-```
-
-## Tests
-
-Run validator tests:
-
-```bash
-pytest tests/test_validator.py
-```
-
-Run syntax check:
-
-```bash
-python -m py_compile src/check_dataset.py src/validate_plan.py tests/test_validator.py
-```
-
-## Typical Workflow
-
-Generate or validate dataset:
-
-```bash
-python src/generate_dataset.py
-python src/check_dataset.py --data data/blocks_world_easy.jsonl
-```
-
-Convert JSON problems to PDDL:
-
-```bash
-python src/json_to_pddl.py
-```
-
-Run external planner:
-
-```bash
-python src/run_planner.py
-```
-
-Validate generated plan:
-
-```bash
-python src/validate_plan.py --demo
-```
-
-Evaluate results:
-
-```bash
-python src/evaluate.py
-```
-
-Visualize metrics:
-
-```bash
-python src/visualize.py
-```
-
-Launch app:
-
-```bash
-streamlit run app/streamlit_app.py
-```
-
-## Outputs
-
-Generated artifacts are stored under:
-
-```text
-pddl/generated_problems/
-results/raw_outputs/
-results/metrics.csv
-results/figures/
-```
-
-## Symbolic Planner
-
-Convert JSONL problem to PDDL:
-
-```bash
-python src/json_to_pddl.py --input data/blocks_world_easy.jsonl --index 0
-```
-
-Run pyperplan:
-
-```bash
-python src/run_planner.py --problem pddl/problems/bw_easy_001.pddl
-```
-
-Validate generated plan:
-
-```bash
-python src/validate_plan.py --problem-id bw_easy_001 --plan results/example_plan.txt
-```
-
-## LLM-only Baseline
-
-The LLM-only baseline asks a language model to generate a Blocks World plan directly from the natural-language task description.
-
-Supported modes:
-
-```text
-hf      Hugging Face Inference API
-local   Local OpenAI-compatible chat completion API
-```
-
-Create local environment config:
-
-```bash
-cp .env.example .env
-```
-
-Run with Hugging Face:
-
-```bash
-LLM_MODE=hf python src/llm_only_baseline.py --data data/blocks_world_easy.jsonl --limit 3
-```
-
-Run with local API:
-
-```bash
-LLM_MODE=local python src/llm_only_baseline.py --data data/blocks_world_easy.jsonl --limit 3
-```
-
-Outputs:
+Output:
 
 ```text
 results/raw_outputs/llm_only/
 results/llm_only_results.csv
 ```
 
-CSV columns:
-
-```text
-id,difficulty,method,raw_output,parse_success,plan_valid,goal_achieved,success,plan_length,error_type
-```
-
-## LLM-to-JSON-to-PDDL Pipeline
-
-This pipeline asks an LLM to convert a natural-language Blocks World task into structured JSON. The JSON is converted to a PDDL problem, solved by pyperplan, and validated against the original dataset problem.
-
-Run with Hugging Face mode:
+### LLM + symbolic planner
 
 ```bash
-LLM_MODE=hf python src/llm_to_json.py --data data/blocks_world_easy.jsonl --limit 3
+python src/llm_to_json.py --data data/blocks_world_easy.jsonl --limit 3
 ```
 
-Run with local API mode:
-
-```bash
-LLM_MODE=local python src/llm_to_json.py --data data/blocks_world_easy.jsonl --limit 3
-```
-
-Outputs:
+Output:
 
 ```text
 results/raw_outputs/llm_to_json/
@@ -308,45 +231,22 @@ results/plans/llm_to_json/
 results/llm_planner_results.csv
 ```
 
-CSV columns:
+## 7. Chạy đánh giá thống nhất
 
-```text
-id,difficulty,method,json_parse_success,pddl_generated,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
-```
-
-## Troubleshooting
-
-If the planner fails with no solution found, even after pyperplan exits successfully, it may be due to an unsolvable problem generated from the LLM's JSON output.
-
-Check error messages in results/llm_planner_results.csv under the error_type column, which may contain detailed pyperplan output indicating unsolvability.
-
-Examples:
-
-```text
-planner_no_solution_file: 2026-06-06 11:58:40,765 INFO     24 Operators created | 2026-06-06 11:58:40,765 INFO     Search start: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Initial h value: inf | 2026-06-06 11:58:40,765 INFO     No operators left. Task unsolvable. | 2026-06-06 11:58:40,765 INFO     1 Nodes expanded | 2026-06-06 11:58:40,765 INFO     Search end: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Search time: 0.0 | 2026-06-06 11:58:40,765 WARNING  No solution could be found
-```
-
-## Unified Evaluation
-
-Run LLM-only evaluation:
+Chạy một phương pháp:
 
 ```bash
-python src/evaluate.py --method llm_only --data data/blocks_world_easy.jsonl
-``` 
-
-Run LLM + planner evaluation:
-
-```bash
-python src/evaluate.py --method llm_planner --data data/blocks_world_easy.jsonl
+python src/evaluate.py --method llm_only --data data/blocks_world_easy.jsonl --limit 3 --reset
+python src/evaluate.py --method llm_planner --data data/blocks_world_easy.jsonl --limit 3 --reset
 ```
 
-Run both methods:
+Chạy cả hai phương pháp:
 
 ```bash
-python src/evaluate.py --method all --data data/blocks_world_easy.jsonl
+python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --limit 3 --reset
 ```
 
-Run full dataset evaluation:
+Chạy toàn bộ thí nghiệm:
 
 ```bash
 python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
@@ -354,131 +254,124 @@ python src/evaluate.py --method all --data data/blocks_world_medium.jsonl
 python src/evaluate.py --method all --data data/blocks_world_hard.jsonl
 ```
 
-Unified metrics are saved to:
+Output thống nhất:
 
 ```text
 results/metrics.csv
 ```
 
-Metrics columns:
+## 8. Metrics
 
-```text
+`results/metrics.csv` sử dụng các cột sau:
+
+```csv
 id,difficulty,method,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
 ```
 
-## Running and Comparing Methods
+Các metric chính:
 
-LLM-only evaluation:
+| Metric | Meaning |
+|---|---|
+| `parse_success` | LLM output có được parse thành công hay không |
+| `planner_success` | `pyperplan` có tạo được kế hoạch hay không |
+| `plan_valid` | Kế hoạch có thỏa mãn precondition/effect của action hay không |
+| `goal_achieved` | Trạng thái cuối cùng có thỏa mãn goal hay không |
+| `success` | Thành công end-to-end |
+| `plan_length` | Số lượng action |
+| `runtime` | Thời gian chạy tính bằng giây |
+| `error_type` | Loại lỗi |
 
-```bash
-python src/evaluate.py --method llm_only --data data/blocks_world_easy.jsonl
-```
+Xem `docs/metrics.md` để biết chi tiết.
 
-LLM-to-JSON-to-PDDL (hybrid) evaluation:
-
-```bash
-python src/evaluate.py --method llm_planner --data data/blocks_world_easy.jsonl
-```
-
-Run both methods and compare:
-
-```bash
-python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
-```
-
-Example summary output:
-
-```
-========================================
-Results Summary (Easy Dataset)
-========================================
-
-LLM-Only Method:
-Success: 2/3 (66.67%)
-Avg. Plan Length: 2.00 steps
-Avg. Runtime: 2.6395 seconds
-
-LLM-Planner Method:
-Success: 2/3 (66.67%)
-Avg. Plan Length: 2.00 steps
-Avg. Runtime: 14.1880 seconds
-
-Comparison:
-- Plan Length: Same (2.00 vs 2.00)
-- Runtime: LLM-only is ~5x faster
-- Success Rates: Identical (66.67%)
-```
-
-Run full dataset:
-
-```bash
-python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
-python src/evaluate.py --method all --data data/blocks_world_medium.jsonl
-python src/evaluate.py --method all --data data/blocks_world_hard.jsonl
-```
-
-Metrics are saved to:
-
-```text
-results/metrics.csv
-```
-
-## Adding New Methods
-
-To add a new evaluation method (e.g., "symbolic"), implement a function `evaluate_symbolic(...)` and update `evaluate.py`:
-
-1. Create `evaluate_symbolic(records, method_name)`
-2. Call it in `main()` when `method == "symbolic"`
-3. Generate metrics rows in the same format as other methods
-4. Add metrics to summary display
-
-## Visualization
-
-Generate result figures from unified metrics:
+## 9. Tạo figures
 
 ```bash
 python src/visualize.py --metrics results/metrics.csv
 ```
 
-Generated figures:
+Các figure được tạo:
 
-- `results/figures/success_rate_by_method.png`
-- `results/figures/success_rate_by_difficulty.png`
-- `results/figures/error_distribution.png`
-- `results/figures/avg_plan_length.png`
+```text
+results/figures/success_rate_by_method.png
+results/figures/success_rate_by_difficulty.png
+results/figures/error_distribution.png
+results/figures/avg_plan_length.png
+```
 
-Render a Blocks World plan as text:
+Render một qualitative plan trace:
 
 ```bash
 python src/render_plan.py --problem-id bw_easy_001
 ```
 
-Or specify a plan file:
-
-```bash
-python src/render_plan.py --problem-id bw_easy_001 --plan results/plans/llm_to_json/bw_easy_001.txt
-```
-
-## Streamlit Demo App
-
-Run the interactive demo:
+## 10. Chạy Streamlit Demo
 
 ```bash
 streamlit run app/streamlit_app.py
 ```
 
-The app supports:
+Ứng dụng hỗ trợ:
 
-- Natural-language task input
-- LLM-only planning
-- LLM + planner pipeline
-- Raw LLM output display
-- Structured JSON and PDDL display
-- Plan display
-- Validator result display
-- Step-by-step Blocks World state rendering
+- Nhập nhiệm vụ bằng ngôn ngữ tự nhiên
+- Các nhiệm vụ ví dụ
+- Lập kế hoạch LLM-only
+- Pipeline LLM + planner
+- Hiển thị raw LLM output
+- Hiển thị JSON có cấu trúc và PDDL được tạo
+- Hiển thị plan
+- Hiển thị kết quả validator
+- Render trạng thái Blocks World từng bước
 
-Supported LLM modes:
+Ứng dụng đọc credentials từ `.env`.
 
-- hf: Hugging Face Inference API
-- local: OpenAI-compatible local API
+## 11. Các lỗi thường gặp
+
+### `HF_TOKEN` bị thiếu
+
+Tạo `.env` và thiết lập:
+
+```env
+HF_TOKEN=your_huggingface_token_here
+```
+
+### `planner_no_solution_file`
+
+Bài toán PDDL được tạo có thể không giải được. Điều này thường có nghĩa là LLM đã tạo biểu diễn JSON không chính xác so với nhiệm vụ ban đầu.
+
+Kiểm tra:
+
+```bash
+cat results/raw_outputs/llm_to_json/<file>.txt
+cat pddl/problems/llm_to_json/<problem_id>.pddl
+```
+
+### `precondition_violation`
+
+Kế hoạch được tạo chứa một action không thể chạy hợp lệ trong trạng thái hiện tại.
+
+Sử dụng:
+
+```bash
+python src/render_plan.py --problem-id <problem_id> --plan <plan_file>
+```
+
+### `ModuleNotFoundError`
+
+Đảm bảo môi trường đúng đã được kích hoạt và các dependency đã được cài đặt:
+
+```bash
+pip install -r requirements.txt
+```
+
+Thông tin chi tiết hơn có trong `docs/troubleshooting.md`.
+
+## 12. Tài liệu
+
+Tài liệu bổ sung:
+
+```text
+docs/demo_design.md
+docs/metrics.md
+docs/experiment_protocol.md
+docs/troubleshooting.md
+```
