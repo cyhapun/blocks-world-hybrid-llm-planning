@@ -240,3 +240,45 @@ Validate generated plan:
 ```bash
 python src/validate_plan.py --problem-id bw_easy_001 --plan results/example_plan.txt
 ```
+
+## LLM-only Baseline
+
+The LLM-only baseline asks a language model to generate a Blocks World plan directly from the natural-language task description.
+
+Supported modes:
+
+```text
+hf      Hugging Face Inference API
+local   Local OpenAI-compatible chat completion API
+```
+
+Create local environment config:
+
+```bash
+cp .env.example .env
+```
+
+Run with Hugging Face:
+
+```bash
+LLM_MODE=hf python src/llm_only_baseline.py --data data/blocks_world_easy.jsonl --limit 3
+```
+
+Run with local API:
+
+```bash
+LLM_MODE=local python src/llm_only_baseline.py --data data/blocks_world_easy.jsonl --limit 3
+```
+
+Outputs:
+
+```text
+results/raw_outputs/llm_only/
+results/llm_only_results.csv
+```
+
+CSV columns:
+
+```text
+id,difficulty,method,raw_output,parse_success,plan_valid,goal_achieved,success,plan_length,error_type
+```
