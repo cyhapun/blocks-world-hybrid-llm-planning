@@ -1,0 +1,6 @@
+id,difficulty,method,raw_output,parse_success,plan_valid,goal_achieved,success,plan_length,error_type
+bw_easy_001,easy,llm_only_hf,"pick-up(A)
+stack(A, B)",True,True,True,True,2,
+bw_easy_002,easy,llm_only_hf,"pick-up(B)
+stack(B, C)",True,True,True,True,2,
+bw_easy_003,easy,llm_only_hf,"stack(C, A)",True,False,False,False,1,precondition_violation
