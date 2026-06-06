@@ -1,0 +1,2 @@
+pick-up(x)
+stack(x, b)

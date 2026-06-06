@@ -2,13 +2,13 @@
   "objects": ["A", "B", "C"],
   "init": [
     ["on_table", "A"],
-    ["on_table", "B"],
-    ["on", "C", "B"],
-    ["clear", "A"],
+    ["on", "B", "A"],
+    ["on_table", "D"],
     ["clear", "C"],
+    ["clear", "D"],
     ["handempty"]
   ],
   "goal": [
-    ["on", "C", "A"]
+    ["on", "C", "D"]
   ]
 }

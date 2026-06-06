@@ -3,12 +3,15 @@
   "init": [
     ["on_table", "A"],
     ["on_table", "B"],
-    ["on", "C", "B"],
-    ["clear", "A"],
+    ["on_table", "C"],
+    ["on", "D", "A"],
+    ["clear", "D"],
+    ["clear", "B"],
     ["clear", "C"],
     ["handempty"]
   ],
   "goal": [
-    ["on", "C", "A"]
+    ["on", "C", "D"],
+    ["on", "B", "A"]
   ]
 }

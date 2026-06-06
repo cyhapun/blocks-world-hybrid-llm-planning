@@ -1,7 +1,81 @@
 id,difficulty,method,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
-bw_easy_001,easy,llm_only,True,,True,True,True,2,0.5752,
-bw_easy_002,easy,llm_only,True,,True,True,True,2,0.7480,
-bw_easy_003,easy,llm_only,True,,False,False,False,1,0.4870,precondition_violation
-bw_easy_001,easy,llm_planner,True,True,True,True,True,2,1.3406,
-bw_easy_002,easy,llm_planner,True,True,True,True,True,2,1.4095,
-bw_easy_003,easy,llm_planner,True,False,False,False,False,0,1.4353,"planner_no_solution_file: 2026-06-06 12:19:26,383 INFO     24 Operators created | 2026-06-06 12:19:26,383 INFO     Search start: bw_easy_003 | 2026-06-06 12:19:26,383 INFO     Initial h value: inf | 2026-06-06 12:19:26,383 INFO     No operators left. Task unsolvable. | 2026-06-06 12:19:26,383 INFO     1 Nodes expanded | 2026-06-06 12:19:26,383 INFO     Search end: bw_easy_003 | 2026-06-06 12:19:26,383 INFO     Search time: 0.0 | 2026-06-06 12:19:26,383 WARNING  No solution could be found"
+bw_easy_001,easy,llm_only,True,,True,True,True,2,22.7441,
+bw_easy_002,easy,llm_only,True,,False,False,False,3,4.8018,precondition_violation
+bw_easy_003,easy,llm_only,True,,False,False,False,3,5.0894,precondition_violation
+bw_easy_004,easy,llm_only,True,,False,False,False,3,4.8142,precondition_violation
+bw_easy_005,easy,llm_only,True,,True,True,True,2,3.8677,
+bw_easy_006,easy,llm_only,True,,False,False,False,3,4.6967,precondition_violation
+bw_easy_007,easy,llm_only,True,,False,False,False,2,3.8357,unknown_object
+bw_easy_008,easy,llm_only,True,,False,False,False,3,5.1948,precondition_violation
+bw_easy_009,easy,llm_only,True,,False,False,False,3,5.5814,precondition_violation
+bw_easy_010,easy,llm_only,True,,False,False,False,1,3.5427,precondition_violation
+bw_easy_001,easy,llm_planner,True,True,True,True,True,2,28.2016,
+bw_easy_002,easy,llm_planner,True,True,True,True,True,2,21.5132,
+bw_easy_003,easy,llm_planner,True,True,True,True,True,2,19.7016,
+bw_easy_004,easy,llm_planner,True,True,True,True,True,2,19.6214,
+bw_easy_005,easy,llm_planner,True,True,True,True,True,2,20.2584,
+bw_easy_006,easy,llm_planner,True,True,True,True,True,2,17.7094,
+bw_easy_007,easy,llm_planner,True,True,True,True,True,4,19.5018,
+bw_easy_008,easy,llm_planner,True,True,True,True,True,2,22.7693,
+bw_easy_009,easy,llm_planner,True,True,True,True,True,2,20.0922,
+bw_easy_010,easy,llm_planner,True,True,True,True,True,4,20.1441,
+bw_medium_001,medium,llm_only,True,,True,True,True,4,5.7428,
+bw_medium_002,medium,llm_only,True,,False,False,False,3,5.1084,unknown_object
+bw_medium_003,medium,llm_only,True,,False,False,False,3,5.0451,unknown_object
+bw_medium_004,medium,llm_only,True,,False,False,False,3,5.6529,precondition_violation
+bw_medium_005,medium,llm_only,True,,True,True,True,2,4.2310,
+bw_medium_006,medium,llm_only,True,,False,False,False,5,6.7086,precondition_violation
+bw_medium_007,medium,llm_only,True,,False,False,False,1,3.3229,precondition_violation
+bw_medium_008,medium,llm_only,True,,False,False,False,3,5.4402,precondition_violation
+bw_medium_009,medium,llm_only,True,,False,False,False,1,3.3395,precondition_violation
+bw_medium_010,medium,llm_only,True,,False,False,False,5,7.5715,precondition_violation
+bw_medium_011,medium,llm_only,True,,True,True,True,2,4.1416,
+bw_medium_012,medium,llm_only,True,,False,False,False,2,4.1687,unknown_object
+bw_medium_013,medium,llm_only,True,,False,False,False,2,4.0289,precondition_violation
+bw_medium_014,medium,llm_only,True,,False,False,False,8,9.1876,precondition_violation
+bw_medium_015,medium,llm_only,True,,False,False,False,6,7.5692,precondition_violation
+bw_medium_001,medium,llm_planner,True,True,True,True,True,4,29.5814,
+bw_medium_002,medium,llm_planner,True,True,True,True,True,2,28.5049,
+bw_medium_003,medium,llm_planner,True,True,True,True,True,2,22.4268,
+bw_medium_004,medium,llm_planner,True,True,True,True,True,2,25.3854,
+bw_medium_005,medium,llm_planner,True,False,False,False,False,0,22.2993,"planner_no_solution_file: 2026-06-06 17:35:59,183 INFO     40 Operators created | 2026-06-06 17:35:59,183 INFO     Search start: bw_medium_005 | 2026-06-06 17:35:59,183 INFO     Initial h value: inf | 2026-06-06 17:35:59,183 INFO     No operators left. Task unsolvable. | 2026-06-06 17:35:59,183 INFO     1 Nodes expanded | 2026-06-06 17:35:59,183 INFO     Search end: bw_medium_005 | 2026-06-06 17:35:59,183 INFO     Search time: 0.0 | 2026-06-06 17:35:59,183 WARNING  No solution could be found"
+bw_medium_006,medium,llm_planner,False,False,False,False,False,0,29.3705,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_007,medium,llm_planner,True,True,True,True,True,2,26.3780,
+bw_medium_008,medium,llm_planner,True,True,True,True,True,2,31.3299,
+bw_medium_009,medium,llm_planner,True,True,True,True,True,2,25.5088,
+bw_medium_010,medium,llm_planner,False,False,False,False,False,0,20.3722,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_011,medium,llm_planner,True,True,True,True,True,2,28.2898,
+bw_medium_012,medium,llm_planner,False,False,False,False,False,0,23.0352,json_parse_error: Object 'C' in init does not exist in objects.
+bw_medium_013,medium,llm_planner,False,False,False,False,False,0,24.3235,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_014,medium,llm_planner,True,True,True,True,True,2,26.6038,
+bw_medium_015,medium,llm_planner,False,False,False,False,False,0,27.6860,json_parse_error: Object 'D' in init does not exist in objects.
+bw_hard_001,hard,llm_only,True,,False,False,False,6,8.1700,precondition_violation
+bw_hard_002,hard,llm_only,True,,False,False,False,2,4.5700,precondition_violation
+bw_hard_003,hard,llm_only,True,,False,False,False,11,11.4922,precondition_violation
+bw_hard_004,hard,llm_only,True,,False,False,False,5,7.0273,precondition_violation
+bw_hard_005,hard,llm_only,True,,False,False,False,4,5.5294,precondition_violation
+bw_hard_006,hard,llm_only,True,,False,False,False,8,9.1281,precondition_violation
+bw_hard_007,hard,llm_only,True,,False,False,False,5,6.7701,precondition_violation
+bw_hard_008,hard,llm_only,True,,False,False,False,9,13.7203,invalid_action
+bw_hard_009,hard,llm_only,True,,False,False,False,6,7.5116,precondition_violation
+bw_hard_010,hard,llm_only,True,,False,False,False,2,4.2343,precondition_violation
+bw_hard_011,hard,llm_only,True,,False,False,False,8,9.5049,precondition_violation
+bw_hard_012,hard,llm_only,True,,False,False,False,10,11.6763,unknown_object
+bw_hard_013,hard,llm_only,True,,False,False,False,4,6.1510,precondition_violation
+bw_hard_014,hard,llm_only,True,,False,False,False,6,7.6902,precondition_violation
+bw_hard_015,hard,llm_only,True,,False,False,False,14,15.0423,precondition_violation
+bw_hard_001,hard,llm_planner,True,True,False,False,False,4,32.3982,goal_not_achieved
+bw_hard_002,hard,llm_planner,True,True,True,True,True,6,33.1432,
+bw_hard_003,hard,llm_planner,True,True,True,True,True,4,27.9046,
+bw_hard_004,hard,llm_planner,True,True,True,True,True,6,33.3403,
+bw_hard_005,hard,llm_planner,True,True,False,False,False,6,27.2963,precondition_violation
+bw_hard_006,hard,llm_planner,True,True,True,True,True,4,33.1440,
+bw_hard_007,hard,llm_planner,True,True,True,True,True,4,28.6426,
+bw_hard_008,hard,llm_planner,True,True,True,True,True,6,34.1648,
+bw_hard_009,hard,llm_planner,True,True,True,True,True,6,38.2936,
+bw_hard_010,hard,llm_planner,True,True,True,True,True,6,35.6989,
+bw_hard_011,hard,llm_planner,True,True,True,True,True,6,37.5392,
+bw_hard_012,hard,llm_planner,True,True,True,True,True,6,31.1515,
+bw_hard_013,hard,llm_planner,False,False,False,False,False,0,30.8462,json_parse_error: Object 'D' in init does not exist in objects.
+bw_hard_014,hard,llm_planner,True,True,False,False,False,6,32.4539,precondition_violation
+bw_hard_015,hard,llm_planner,True,True,True,True,True,12,35.6192,
