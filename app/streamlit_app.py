@@ -403,6 +403,11 @@ def run_llm_planner(
 
             if not planner_success:
                 runtime = time.perf_counter() - start_time
+                error_code, error_reason = normalize_pipeline_error(
+                    planner_error,
+                    "planner_error",
+                )
+
                 return {
                     "method": "llm_planner",
                     "problem": source_problem,
@@ -411,13 +416,13 @@ def run_llm_planner(
                     "pddl_text": pddl_text,
                     "plan_text": "",
                     "validator_result": validation | {
-                        "error_type": "planner_error",
-                        "reason": planner_error or "Planner failed.",
+                        "error_type": error_code,
+                        "reason": error_reason,
                     },
                     "runtime": runtime,
                     "rendered_plan": "",
                 }
-
+                
         actions = parse_action_lines_for_render(plan_lines)
 
         # Validate against the original problem, not LLM-generated problem.
@@ -506,8 +511,60 @@ def show_problem_summary(problem: Dict[str, Any]) -> None:
 
     st.caption(f"Difficulty: `{problem.get('difficulty', 'demo')}`")
 
+def split_error_message(error_type: str | None, reason: str | None) -> tuple[str, str]:
+    raw = reason or error_type or ""
+
+    if ":" in raw:
+        short_error, technical_detail = raw.split(":", 1)
+        return short_error.strip(), technical_detail.strip()
+
+    return raw.strip() or "none", ""
+
+
+def humanize_error(error_type: str | None, reason: str | None) -> tuple[str, str, str]:
+    short_error, technical_detail = split_error_message(error_type, reason)
+
+    if short_error in {"none", "None", ""}:
+        return "No error", "The plan passed validation.", technical_detail
+
+    messages = {
+        "parse_error": "The model output could not be parsed into actions.",
+        "json_parse_error": "The model output could not be parsed into valid structured JSON.",
+        "pddl_generation_error": "The structured JSON could not be converted into a PDDL problem.",
+        "planner_error": "The planner failed while solving the generated PDDL problem.",
+        "planner_no_solution_file": "The planner could not find a solution for the generated problem.",
+        "plan_parse_error": "The planner output could not be parsed into actions.",
+        "precondition_violation": "The plan contains an action whose preconditions are not satisfied.",
+        "goal_not_achieved": "The plan ran successfully, but the final goal was not achieved.",
+        "unknown_action": "The plan contains an unsupported action.",
+        "unknown_object": "The plan uses an object that does not exist in the problem.",
+        "invalid_action": "The plan contains an invalid action.",
+        "invalid_action_format": "The action format is invalid.",
+        "invalid_problem": "The problem definition is invalid.",
+        "llm_error": "The language model request failed.",
+        "unexpected_error": "An unexpected error occurred.",
+        "not_run": "This step was not run.",
+    }
+
+    friendly = messages.get(short_error, "An error occurred during the pipeline.")
+    return short_error, friendly, technical_detail
+
+def normalize_pipeline_error(raw_error: str | None, fallback: str) -> tuple[str, str]:
+    if not raw_error:
+        return fallback, fallback
+
+    if ":" in raw_error:
+        code, detail = raw_error.split(":", 1)
+        return code.strip(), detail.strip()
+
+    return raw_error.strip(), raw_error.strip()
+
 def show_result(result: Dict[str, Any]) -> None:
     validator_result = result["validator_result"]
+    error_code, error_message, technical_detail = humanize_error(
+        validator_result.get("error_type"),
+        validator_result.get("reason"),
+    )
     problem = result["problem"]
 
     is_success = bool(
@@ -520,7 +577,10 @@ def show_result(result: Dict[str, Any]) -> None:
     if is_success:
         st.success("Plan is valid and goal is achieved.")
     else:
-        st.error(validator_result.get("reason", "Plan failed."))
+        st.error(error_message)
+
+        if error_code and error_code != "No error":
+            st.caption(f"Error code: `{error_code}`")
 
     show_problem_summary(problem)
 
@@ -538,8 +598,7 @@ def show_result(result: Dict[str, Any]) -> None:
         st.metric("Runtime", summary["Runtime"])
 
     with col4:
-        error_type = summary["Error type"]
-        st.metric("Error", error_type if error_type != "None" else "None")
+        st.metric("Error", "None" if is_success else error_code)
 
     st.divider()
 
@@ -563,6 +622,10 @@ def show_result(result: Dict[str, Any]) -> None:
                 result.get("pddl_text", "") or "<PDDL was not generated>",
                 language="lisp",
             )
+
+    if technical_detail:
+        with st.expander("Technical error details", expanded=False):
+            st.code(technical_detail, language="text")
 
     with st.expander("Raw LLM output", expanded=False):
         st.code(result.get("raw_output", "") or "<empty>", language="text")
