@@ -459,3 +459,26 @@ Or specify a plan file:
 python src/render_plan.py --problem-id bw_easy_001 --plan results/plans/llm_to_json/bw_easy_001.txt
 ```
 
+## Streamlit Demo App
+
+Run the interactive demo:
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+The app supports:
+
+- Natural-language task input
+- LLM-only planning
+- LLM + planner pipeline
+- Raw LLM output display
+- Structured JSON and PDDL display
+- Plan display
+- Validator result display
+- Step-by-step Blocks World state rendering
+
+Supported LLM modes:
+
+- hf: Hugging Face Inference API
+- local: OpenAI-compatible local API
