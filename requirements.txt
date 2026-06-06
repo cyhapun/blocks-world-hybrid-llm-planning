@@ -1,5 +1,4 @@
 pyperplan
-openai
 python-dotenv
 pandas
 numpy
@@ -7,3 +6,6 @@ matplotlib
 streamlit
 tqdm
 pytest
+huggingface_hub>=0.26.0
+python-dotenv>=1.0.0
+requests>=2.31.0
