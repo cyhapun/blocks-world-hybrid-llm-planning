@@ -403,6 +403,11 @@ def run_llm_planner(
 
             if not planner_success:
                 runtime = time.perf_counter() - start_time
+                error_code, error_reason = normalize_pipeline_error(
+                    planner_error,
+                    "planner_error",
+                )
+
                 return {
                     "method": "llm_planner",
                     "problem": source_problem,
@@ -411,13 +416,13 @@ def run_llm_planner(
                     "pddl_text": pddl_text,
                     "plan_text": "",
                     "validator_result": validation | {
-                        "error_type": "planner_error",
-                        "reason": planner_error or "Planner failed.",
+                        "error_type": error_code,
+                        "reason": error_reason,
                     },
                     "runtime": runtime,
                     "rendered_plan": "",
                 }
-
+                
         actions = parse_action_lines_for_render(plan_lines)
 
         # Validate against the original problem, not LLM-generated problem.
@@ -468,41 +473,165 @@ def run_llm_planner(
         "rendered_plan": rendered_plan,
     }
 
+def format_bool(value: bool) -> str:
+    return "✅ Yes" if value else "❌ No"
+
+
+def format_plan_steps(plan_text: str) -> str:
+    if not plan_text.strip():
+        return "<no plan>"
+
+    lines = [line.strip() for line in plan_text.splitlines() if line.strip()]
+    return "\n".join(f"{idx}. {line}" for idx, line in enumerate(lines, start=1))
+
+
+def summarize_validator_result(result: Dict[str, Any]) -> Dict[str, Any]:
+    validator = result["validator_result"]
+
+    return {
+        "Valid": format_bool(bool(validator.get("valid"))),
+        "Goal achieved": format_bool(bool(validator.get("goal_achieved"))),
+        "Error type": validator.get("error_type") or "None",
+        "Failed step": validator.get("failed_step") or "None",
+        "Runtime": f"{result['runtime']:.2f}s",
+    }
+
+
+def show_problem_summary(problem: Dict[str, Any]) -> None:
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Objects", len(problem["objects"]))
+
+    with col2:
+        st.metric("Initial facts", len(problem["initial_state"]))
+
+    with col3:
+        st.metric("Goals", len(problem["goal"]))
+
+    st.caption(f"Difficulty: `{problem.get('difficulty', 'demo')}`")
+
+def split_error_message(error_type: str | None, reason: str | None) -> tuple[str, str]:
+    raw = reason or error_type or ""
+
+    if ":" in raw:
+        short_error, technical_detail = raw.split(":", 1)
+        return short_error.strip(), technical_detail.strip()
+
+    return raw.strip() or "none", ""
+
+
+def humanize_error(error_type: str | None, reason: str | None) -> tuple[str, str, str]:
+    short_error, technical_detail = split_error_message(error_type, reason)
+
+    if short_error in {"none", "None", ""}:
+        return "No error", "The plan passed validation.", technical_detail
+
+    messages = {
+        "parse_error": "The model output could not be parsed into actions.",
+        "json_parse_error": "The model output could not be parsed into valid structured JSON.",
+        "pddl_generation_error": "The structured JSON could not be converted into a PDDL problem.",
+        "planner_error": "The planner failed while solving the generated PDDL problem.",
+        "planner_no_solution_file": "The planner could not find a solution for the generated problem.",
+        "plan_parse_error": "The planner output could not be parsed into actions.",
+        "precondition_violation": "The plan contains an action whose preconditions are not satisfied.",
+        "goal_not_achieved": "The plan ran successfully, but the final goal was not achieved.",
+        "unknown_action": "The plan contains an unsupported action.",
+        "unknown_object": "The plan uses an object that does not exist in the problem.",
+        "invalid_action": "The plan contains an invalid action.",
+        "invalid_action_format": "The action format is invalid.",
+        "invalid_problem": "The problem definition is invalid.",
+        "llm_error": "The language model request failed.",
+        "unexpected_error": "An unexpected error occurred.",
+        "not_run": "This step was not run.",
+    }
+
+    friendly = messages.get(short_error, "An error occurred during the pipeline.")
+    return short_error, friendly, technical_detail
+
+def normalize_pipeline_error(raw_error: str | None, fallback: str) -> tuple[str, str]:
+    if not raw_error:
+        return fallback, fallback
+
+    if ":" in raw_error:
+        code, detail = raw_error.split(":", 1)
+        return code.strip(), detail.strip()
+
+    return raw_error.strip(), raw_error.strip()
 
 def show_result(result: Dict[str, Any]) -> None:
     validator_result = result["validator_result"]
+    error_code, error_message, technical_detail = humanize_error(
+        validator_result.get("error_type"),
+        validator_result.get("reason"),
+    )
+    problem = result["problem"]
 
-    st.subheader("Validator Result")
+    is_success = bool(
+        validator_result.get("valid")
+        and validator_result.get("goal_achieved")
+    )
 
-    if validator_result.get("valid") and validator_result.get("goal_achieved"):
+    st.subheader("Result")
+
+    if is_success:
         st.success("Plan is valid and goal is achieved.")
     else:
-        st.error("Plan failed validation or did not reach the goal.")
+        st.error(error_message)
 
-    st.json(validator_result)
+        if error_code and error_code != "No error":
+            st.caption(f"Error code: `{error_code}`")
 
-    st.caption(f"Runtime: {result['runtime']:.4f}s")
+    show_problem_summary(problem)
 
-    st.subheader("Raw LLM Output")
-    st.code(result.get("raw_output", "") or "<empty>", language="text")
+    summary = summarize_validator_result(result)
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric("Valid", summary["Valid"])
+
+    with col2:
+        st.metric("Goal", summary["Goal achieved"])
+
+    with col3:
+        st.metric("Runtime", summary["Runtime"])
+
+    with col4:
+        st.metric("Error", "None" if is_success else error_code)
+
+    st.divider()
+
+    st.subheader("Generated Plan")
+    st.code(format_plan_steps(result.get("plan_text", "")), language="text")
+
+    st.subheader("Step-by-step State")
+    st.code(result.get("rendered_plan", "") or "<no rendered plan>", language="text")
 
     if result["method"] == "llm_planner":
-        st.subheader("Structured JSON")
-        structured_json = result.get("structured_json")
+        with st.expander("Structured JSON", expanded=False):
+            structured_json = result.get("structured_json")
 
-        if structured_json is None:
-            st.code("<JSON was not parsed>", language="text")
-        else:
-            st.json(structured_json)
+            if structured_json is None:
+                st.info("JSON was not parsed.")
+            else:
+                st.json(structured_json)
 
-        st.subheader("Generated PDDL")
-        st.code(result.get("pddl_text", "") or "<PDDL was not generated>", language="lisp")
+        with st.expander("Generated PDDL", expanded=False):
+            st.code(
+                result.get("pddl_text", "") or "<PDDL was not generated>",
+                language="lisp",
+            )
 
-    st.subheader("Plan")
-    st.code(result.get("plan_text", "") or "<no plan>", language="text")
+    if technical_detail:
+        with st.expander("Technical error details", expanded=False):
+            st.code(technical_detail, language="text")
 
-    st.subheader("Step-by-step Blocks World State")
-    st.code(result.get("rendered_plan", "") or "<no rendered plan>", language="text")
+    with st.expander("Raw LLM output", expanded=False):
+        st.code(result.get("raw_output", "") or "<empty>", language="text")
+
+    with st.expander("Full validator result", expanded=False):
+        st.json(validator_result)
 
 
 def main() -> None:
@@ -604,10 +733,10 @@ def main() -> None:
     col1, col2 = st.columns(2)
 
     with col1:
-        run_llm_only_clicked = st.button("Run LLM-only", use_container_width=True)
+        run_llm_only_clicked = st.button("Generate Direct Plan", use_container_width=True)
 
     with col2:
-        run_llm_planner_clicked = st.button("Run LLM + Planner", use_container_width=True)
+        run_llm_planner_clicked = st.button("Generate Planner-backed Plan", use_container_width=True)
 
     if run_llm_only_clicked or run_llm_planner_clicked:
         if not task_text.strip():
@@ -642,13 +771,13 @@ def main() -> None:
                     search=search,
                 )
 
-    tab1, tab2 = st.tabs(["LLM-only", "LLM + Planner"])
+    tab1, tab2 = st.tabs(["Direct LLM Plan", "LLM → JSON → Planner"])
 
     with tab1:
         result = st.session_state.llm_only_result
 
         if result is None:
-            st.info("Click **Run LLM-only** to generate a direct plan.")
+            st.info("Click **Run LLM-only** to generate a plan directly from the task.")
         else:
             show_result(result)
 
@@ -656,7 +785,7 @@ def main() -> None:
         result = st.session_state.llm_planner_result
 
         if result is None:
-            st.info("Click **Run LLM + Planner** to run JSON/PDDL/planner pipeline.")
+            st.info("Click **Run LLM + Planner** to convert the task to JSON/PDDL and solve it with pyperplan.")
         else:
             show_result(result)
 
