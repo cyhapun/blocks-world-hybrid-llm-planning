@@ -325,3 +325,109 @@ Examples:
 ```text
 planner_no_solution_file: 2026-06-06 11:58:40,765 INFO     24 Operators created | 2026-06-06 11:58:40,765 INFO     Search start: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Initial h value: inf | 2026-06-06 11:58:40,765 INFO     No operators left. Task unsolvable. | 2026-06-06 11:58:40,765 INFO     1 Nodes expanded | 2026-06-06 11:58:40,765 INFO     Search end: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Search time: 0.0 | 2026-06-06 11:58:40,765 WARNING  No solution could be found
 ```
+
+## Unified Evaluation
+
+Run LLM-only evaluation:
+
+```bash
+python src/evaluate.py --method llm_only --data data/blocks_world_easy.jsonl
+``` 
+
+Run LLM + planner evaluation:
+
+```bash
+python src/evaluate.py --method llm_planner --data data/blocks_world_easy.jsonl
+```
+
+Run both methods:
+
+```bash
+python src/evaluate.py --method all --data data/blocks_world_easy.jsonl
+```
+
+Run full dataset evaluation:
+
+```bash
+python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
+python src/evaluate.py --method all --data data/blocks_world_medium.jsonl
+python src/evaluate.py --method all --data data/blocks_world_hard.jsonl
+```
+
+Unified metrics are saved to:
+
+```text
+results/metrics.csv
+```
+
+Metrics columns:
+
+```text
+id,difficulty,method,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
+```
+
+## Running and Comparing Methods
+
+LLM-only evaluation:
+
+```bash
+python src/evaluate.py --method llm_only --data data/blocks_world_easy.jsonl
+```
+
+LLM-to-JSON-to-PDDL (hybrid) evaluation:
+
+```bash
+python src/evaluate.py --method llm_planner --data data/blocks_world_easy.jsonl
+```
+
+Run both methods and compare:
+
+```bash
+python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
+```
+
+Example summary output:
+
+```
+========================================
+Results Summary (Easy Dataset)
+========================================
+
+LLM-Only Method:
+Success: 2/3 (66.67%)
+Avg. Plan Length: 2.00 steps
+Avg. Runtime: 2.6395 seconds
+
+LLM-Planner Method:
+Success: 2/3 (66.67%)
+Avg. Plan Length: 2.00 steps
+Avg. Runtime: 14.1880 seconds
+
+Comparison:
+- Plan Length: Same (2.00 vs 2.00)
+- Runtime: LLM-only is ~5x faster
+- Success Rates: Identical (66.67%)
+```
+
+Run full dataset:
+
+```bash
+python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
+python src/evaluate.py --method all --data data/blocks_world_medium.jsonl
+python src/evaluate.py --method all --data data/blocks_world_hard.jsonl
+```
+
+Metrics are saved to:
+
+```text
+results/metrics.csv
+```
+
+## Adding New Methods
+
+To add a new evaluation method (e.g., "symbolic"), implement a function `evaluate_symbolic(...)` and update `evaluate.py`:
+
+1. Create `evaluate_symbolic(records, method_name)`
+2. Call it in `main()` when `method == "symbolic"`
+3. Generate metrics rows in the same format as other methods
+4. Add metrics to summary display
