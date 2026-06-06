@@ -527,3 +527,8 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# Run this command:
+# python src/evaluate.py --method llm_only --data data/blocks_world_easy.jsonl --limit 3 --reset  
+# python src/evaluate.py --method llm_planner --data data/blocks_world_easy.jsonl --limit 3 --reset
+# python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --limit 3 --reset

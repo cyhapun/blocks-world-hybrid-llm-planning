@@ -1,0 +1,7 @@
+id,difficulty,method,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
+bw_easy_001,easy,llm_only,True,,True,True,True,2,0.5752,
+bw_easy_002,easy,llm_only,True,,True,True,True,2,0.7480,
+bw_easy_003,easy,llm_only,True,,False,False,False,1,0.4870,precondition_violation
+bw_easy_001,easy,llm_planner,True,True,True,True,True,2,1.3406,
+bw_easy_002,easy,llm_planner,True,True,True,True,True,2,1.4095,
+bw_easy_003,easy,llm_planner,True,False,False,False,False,0,1.4353,"planner_no_solution_file: 2026-06-06 12:19:26,383 INFO     24 Operators created | 2026-06-06 12:19:26,383 INFO     Search start: bw_easy_003 | 2026-06-06 12:19:26,383 INFO     Initial h value: inf | 2026-06-06 12:19:26,383 INFO     No operators left. Task unsolvable. | 2026-06-06 12:19:26,383 INFO     1 Nodes expanded | 2026-06-06 12:19:26,383 INFO     Search end: bw_easy_003 | 2026-06-06 12:19:26,383 INFO     Search time: 0.0 | 2026-06-06 12:19:26,383 WARNING  No solution could be found"
