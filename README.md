@@ -282,3 +282,46 @@ CSV columns:
 ```text
 id,difficulty,method,raw_output,parse_success,plan_valid,goal_achieved,success,plan_length,error_type
 ```
+
+## LLM-to-JSON-to-PDDL Pipeline
+
+This pipeline asks an LLM to convert a natural-language Blocks World task into structured JSON. The JSON is converted to a PDDL problem, solved by pyperplan, and validated against the original dataset problem.
+
+Run with Hugging Face mode:
+
+```bash
+LLM_MODE=hf python src/llm_to_json.py --data data/blocks_world_easy.jsonl --limit 3
+```
+
+Run with local API mode:
+
+```bash
+LLM_MODE=local python src/llm_to_json.py --data data/blocks_world_easy.jsonl --limit 3
+```
+
+Outputs:
+
+```text
+results/raw_outputs/llm_to_json/
+pddl/problems/llm_to_json/
+results/plans/llm_to_json/
+results/llm_planner_results.csv
+```
+
+CSV columns:
+
+```text
+id,difficulty,method,json_parse_success,pddl_generated,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
+```
+
+## Troubleshooting
+
+If the planner fails with no solution found, even after pyperplan exits successfully, it may be due to an unsolvable problem generated from the LLM's JSON output.
+
+Check error messages in results/llm_planner_results.csv under the error_type column, which may contain detailed pyperplan output indicating unsolvability.
+
+Examples:
+
+```text
+planner_no_solution_file: 2026-06-06 11:58:40,765 INFO     24 Operators created | 2026-06-06 11:58:40,765 INFO     Search start: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Initial h value: inf | 2026-06-06 11:58:40,765 INFO     No operators left. Task unsolvable. | 2026-06-06 11:58:40,765 INFO     1 Nodes expanded | 2026-06-06 11:58:40,765 INFO     Search end: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Search time: 0.0 | 2026-06-06 11:58:40,765 WARNING  No solution could be found
+```
