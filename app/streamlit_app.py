@@ -6,6 +6,9 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+import os
+from dotenv import load_dotenv
+
 import streamlit as st
 
 
@@ -182,27 +185,34 @@ def set_example(example_name: str) -> None:
     st.session_state.llm_planner_result = None
 
 
-def make_client(mode: str, model: str, base_url: str, api_key: str, temperature: float, max_tokens: int) -> LLMClient:
-    if mode == "hf":
+def make_client(
+    backend: str,
+    model_name: str,
+    local_api_url: str,
+    temperature: float,
+    max_tokens: int,
+) -> LLMClient:
+    load_dotenv()
+
+    if backend == "hf":
         config = LLMConfig(
             mode="hf",
-            model=model,
-            api_key=api_key,
+            model=model_name,
+            api_key=os.getenv("HF_TOKEN"),
             temperature=temperature,
             max_tokens=max_tokens,
         )
     else:
         config = LLMConfig(
             mode="local",
-            model=model,
-            base_url=base_url,
-            api_key=api_key,
+            model=model_name,
+            base_url=local_api_url,
+            api_key=os.getenv("LOCAL_LLM_API_KEY", ""),
             temperature=temperature,
             max_tokens=max_tokens,
         )
 
     return LLMClient(config=config)
-
 
 def normalize_action_for_display(action: List[str]) -> str:
     name = action[0]
@@ -523,53 +533,67 @@ def main() -> None:
             set_example(example_name)
             st.rerun()
 
-        st.header("LLM Settings")
+        st.header("Model Settings")
 
-        mode = st.selectbox(
-            "LLM mode",
+        backend = st.selectbox(
+            "Backend",
             ["hf", "local"],
-            index=0,
-            help="hf = Hugging Face Inference API, local = OpenAI-compatible local API",
+            format_func=lambda value: {
+                "hf": "Hugging Face",
+                "local": "Local API",
+            }[value],
+            help="Choose where the language model is served from.",
         )
 
-        default_model = "Qwen/Qwen2.5-7B-Instruct" if mode == "hf" else "local-model"
-
-        model = st.text_input("Model", value=default_model)
-
-        base_url = ""
-        if mode == "local":
-            base_url = st.text_input(
-                "Local base URL",
+        if backend == "hf":
+            model_name = st.text_input(
+                "Model name",
+                value="Qwen/Qwen2.5-7B-Instruct",
+                help="Hugging Face model id.",
+            )
+            local_api_url = ""
+        else:
+            model_name = st.text_input(
+                "Model name",
+                value="local-model",
+                help="Model name exposed by your local API server.",
+            )
+            local_api_url = st.text_input(
+                "Local API URL",
                 value="http://localhost:8000/v1",
+                help="OpenAI-compatible local API base URL.",
             )
 
-        api_key = st.text_input(
-            "API key / token",
-            value="",
-            type="password",
-            help="HF token for hf mode, optional local API key for local mode.",
-        )
+        st.caption("API tokens are loaded from `.env`, not from the UI.")
 
-        temperature = st.number_input(
-            "Temperature",
-            min_value=0.0,
-            max_value=2.0,
-            value=0.0,
-            step=0.1,
-        )
+        with st.expander("Advanced settings", expanded=False):
+            temperature = st.number_input(
+                "Temperature",
+                min_value=0.0,
+                max_value=2.0,
+                value=0.0,
+                step=0.1,
+            )
 
-        max_tokens = st.number_input(
-            "Max tokens",
-            min_value=64,
-            max_value=4096,
-            value=512,
-            step=64,
-        )
+            max_tokens = st.number_input(
+                "Max output tokens",
+                min_value=64,
+                max_value=4096,
+                value=512,
+                step=64,
+            )
 
-        st.header("Planner Settings")
+            heuristic = st.text_input(
+                "Planner heuristic",
+                value="hff",
+                help="Heuristic used by pyperplan.",
+            )
 
-        heuristic = st.text_input("Heuristic", value="hff")
-        search = st.text_input("Search", value="gbf")
+            search = st.text_input(
+                "Planner search",
+                value="gbf",
+                help="Search algorithm used by pyperplan.",
+            )
 
     task_text = st.text_area(
         "Natural language task",
@@ -592,10 +616,9 @@ def main() -> None:
 
         try:
             client = make_client(
-                mode=mode,
-                model=model,
-                base_url=base_url,
-                api_key=api_key,
+                backend=backend,
+                model_name=model_name,
+                local_api_url=local_api_url,
                 temperature=float(temperature),
                 max_tokens=int(max_tokens),
             )
