@@ -266,9 +266,12 @@ def run_planner_and_parse_plan(
     solution_file = find_solution_file(problem_path)
 
     if solution_file is None:
-        return False, [], "planner_no_solution_file"
+        combined_output = (result.stdout + "\n" + result.stderr).strip()
+        error_lines = combined_output.splitlines()[-8:]
+        error_message = " | ".join(error_lines)
+        return False, [], f"planner_no_solution_file: {error_message}"
 
-    raw_plan_text = solution_file.read_text(encoding="utf-8")
+    raw_plan_text = solution_file.read_text(encoding="utf-8")   
     plan_lines = parse_plan_text(raw_plan_text)
 
     if not plan_lines:

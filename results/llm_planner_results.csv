@@ -1,4 +1,4 @@
 id,difficulty,method,json_parse_success,pddl_generated,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
-bw_easy_001,easy,llm_to_json_planner_hf,True,True,False,False,False,False,0,1.4071,planner_error
-bw_easy_002,easy,llm_to_json_planner_hf,True,True,False,False,False,False,0,1.2361,planner_error
-bw_easy_003,easy,llm_to_json_planner_hf,True,True,False,False,False,False,0,1.3932,planner_error
+bw_easy_001,easy,llm_to_json_planner_hf,True,True,True,True,True,True,2,1.5039,
+bw_easy_002,easy,llm_to_json_planner_hf,True,True,True,True,True,True,2,1.3042,
+bw_easy_003,easy,llm_to_json_planner_hf,True,True,False,False,False,False,0,1.3537,planner_no_solution_file
