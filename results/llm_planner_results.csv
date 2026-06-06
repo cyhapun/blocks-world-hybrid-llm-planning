@@ -1,4 +1,4 @@
 id,difficulty,method,json_parse_success,pddl_generated,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
-bw_easy_001,easy,llm_to_json_planner_hf,True,True,True,True,True,True,2,1.5039,
-bw_easy_002,easy,llm_to_json_planner_hf,True,True,True,True,True,True,2,1.3042,
-bw_easy_003,easy,llm_to_json_planner_hf,True,True,False,False,False,False,0,1.3537,planner_no_solution_file
+bw_easy_001,easy,llm_to_json_planner_hf,True,True,True,True,True,True,2,1.8543,
+bw_easy_002,easy,llm_to_json_planner_hf,True,True,True,True,True,True,2,1.1420,
+bw_easy_003,easy,llm_to_json_planner_hf,True,True,False,False,False,False,0,1.0840,"planner_no_solution_file: 2026-06-06 11:58:40,765 INFO     24 Operators created | 2026-06-06 11:58:40,765 INFO     Search start: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Initial h value: inf | 2026-06-06 11:58:40,765 INFO     No operators left. Task unsolvable. | 2026-06-06 11:58:40,765 INFO     1 Nodes expanded | 2026-06-06 11:58:40,765 INFO     Search end: bw_easy_003 | 2026-06-06 11:58:40,765 INFO     Search time: 0.0 | 2026-06-06 11:58:40,765 WARNING  No solution could be found"
