@@ -386,8 +386,9 @@ def run_pipeline(
         print(f"Running {method} for {problem_id}...")
 
         try:
-            prompt = prompt_template.format(
-                natural_language=record["natural_language"]
+            prompt = prompt_template.replace(
+                "{natural_language}",
+                record["natural_language"],
             )
 
             raw_output = client.generate(prompt)
