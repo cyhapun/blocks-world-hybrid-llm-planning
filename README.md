@@ -431,3 +431,31 @@ To add a new evaluation method (e.g., "symbolic"), implement a function `evaluat
 2. Call it in `main()` when `method == "symbolic"`
 3. Generate metrics rows in the same format as other methods
 4. Add metrics to summary display
+
+## Visualization
+
+Generate result figures from unified metrics:
+
+```bash
+python src/visualize.py --metrics results/metrics.csv
+```
+
+Generated figures:
+
+- `results/figures/success_rate_by_method.png`
+- `results/figures/success_rate_by_difficulty.png`
+- `results/figures/error_distribution.png`
+- `results/figures/avg_plan_length.png`
+
+Render a Blocks World plan as text:
+
+```bash
+python src/render_plan.py --problem-id bw_easy_001
+```
+
+Or specify a plan file:
+
+```bash
+python src/render_plan.py --problem-id bw_easy_001 --plan results/plans/llm_to_json/bw_easy_001.txt
+```
+
