@@ -1,0 +1,32 @@
+Convert the following Blocks World task into JSON.
+
+Return only valid JSON with this schema:
+{
+  "objects": ["A", "B", "C"],
+  "init": [
+    ["on_table", "A"],
+    ["on", "C", "A"],
+    ["clear", "C"],
+    ["handempty"]
+  ],
+  "goal": [
+    ["on", "B", "C"]
+  ]
+}
+
+Allowed predicates:
+- on_table(x)
+- on(x, y)
+- clear(x)
+- holding(x)
+- handempty
+
+Rules:
+- Return JSON only.
+- Do not include markdown.
+- Do not include explanations.
+- Use uppercase block names, such as A, B, C.
+- Use "on_table", not "on-table".
+
+Task:
+{natural_language}
