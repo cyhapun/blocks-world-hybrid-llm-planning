@@ -1,0 +1,3 @@
+stack(A, B)
+unstack(D, _)
+stack(D, A)

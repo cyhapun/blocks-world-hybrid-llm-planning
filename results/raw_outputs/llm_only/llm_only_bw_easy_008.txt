@@ -1,0 +1,3 @@
+stack(A, B)
+unstack(C, table)
+stack(C, A)

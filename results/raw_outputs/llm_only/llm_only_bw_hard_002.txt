@@ -1,0 +1,2 @@
+stack(D, A)
+stack(E, B)

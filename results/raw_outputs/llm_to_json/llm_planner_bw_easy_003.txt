@@ -2,7 +2,8 @@
   "objects": ["A", "B", "C"],
   "init": [
     ["on_table", "A"],
-    ["on", "B", "C"],
+    ["on_table", "B"],
+    ["on", "C", "B"],
     ["clear", "A"],
     ["clear", "C"],
     ["handempty"]

@@ -7,7 +7,8 @@
 
   (:init
     (on_table a)
-    (on b c)
+    (on_table b)
+    (on c b)
     (clear a)
     (clear c)
     (handempty)
