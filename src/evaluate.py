@@ -25,6 +25,7 @@ METRICS_COLUMNS = [
     "id",
     "difficulty",
     "method",
+    "prompt_variant",
     "parse_success",
     "planner_success",
     "plan_valid",
@@ -33,6 +34,10 @@ METRICS_COLUMNS = [
     "plan_length",
     "runtime",
     "error_type",
+]
+
+LEGACY_METRICS_COLUMNS = [
+    column for column in METRICS_COLUMNS if column != "prompt_variant"
 ]
 
 
@@ -60,12 +65,44 @@ def write_text(path: Path, content: str) -> None:
 def append_metrics_rows(output_path: Path, rows: List[Dict[str, Any]]) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    file_exists = output_path.exists()
+    file_has_content = output_path.exists() and output_path.stat().st_size > 0
+
+    if file_has_content:
+        with output_path.open("r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            existing_columns = reader.fieldnames
+
+            if existing_columns == LEGACY_METRICS_COLUMNS:
+                existing_rows = list(reader)
+            elif existing_columns == METRICS_COLUMNS:
+                existing_rows = []
+            else:
+                raise ValueError(
+                    f"Unexpected metrics schema in {output_path}: {existing_columns}"
+                )
+
+        if existing_columns == LEGACY_METRICS_COLUMNS:
+            with output_path.open("w", encoding="utf-8", newline="") as f:
+                writer = csv.DictWriter(
+                    f,
+                    fieldnames=METRICS_COLUMNS,
+                    lineterminator="\n",
+                )
+                writer.writeheader()
+
+                for row in existing_rows:
+                    row["prompt_variant"] = "basic"
+
+                writer.writerows(existing_rows)
 
     with output_path.open("a", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=METRICS_COLUMNS)
+        writer = csv.DictWriter(
+            f,
+            fieldnames=METRICS_COLUMNS,
+            lineterminator="\n",
+        )
 
-        if not file_exists:
+        if not file_has_content:
             writer.writeheader()
 
         writer.writerows(rows)
@@ -79,6 +116,7 @@ def reset_metrics_file(output_path: Path) -> None:
 def make_row(
     record: Dict[str, Any],
     method: str,
+    prompt_variant: str,
     parse_success: bool,
     planner_success: Optional[bool],
     plan_valid: bool,
@@ -92,6 +130,7 @@ def make_row(
         "id": record["id"],
         "difficulty": record["difficulty"],
         "method": method,
+        "prompt_variant": prompt_variant,
         "parse_success": parse_success,
         "planner_success": "" if planner_success is None else planner_success,
         "plan_valid": plan_valid,
@@ -151,6 +190,7 @@ def evaluate_llm_only(
     records: List[Dict[str, Any]],
     client: LLMClient,
     prompt_path: Path,
+    prompt_variant: str,
     raw_output_dir: Path,
 ) -> List[Dict[str, Any]]:
     prompt_template = load_text_prompt(prompt_path)
@@ -183,6 +223,7 @@ def evaluate_llm_only(
                     make_row(
                         record=record,
                         method="llm_only",
+                        prompt_variant=prompt_variant,
                         parse_success=False,
                         planner_success=None,
                         plan_valid=False,
@@ -212,6 +253,7 @@ def evaluate_llm_only(
                 make_row(
                     record=record,
                     method="llm_only",
+                    prompt_variant=prompt_variant,
                     parse_success=True,
                     planner_success=None,
                     plan_valid=plan_valid,
@@ -234,6 +276,7 @@ def evaluate_llm_only(
                 make_row(
                     record=record,
                     method="llm_only",
+                    prompt_variant=prompt_variant,
                     parse_success=False,
                     planner_success=None,
                     plan_valid=False,
@@ -253,6 +296,7 @@ def evaluate_llm_planner(
     records: List[Dict[str, Any]],
     client: LLMClient,
     prompt_path: Path,
+    prompt_variant: str,
     domain_path: Path,
     raw_output_dir: Path,
     pddl_output_dir: Path,
@@ -290,6 +334,7 @@ def evaluate_llm_planner(
                     make_row(
                         record=record,
                         method="llm_planner",
+                        prompt_variant=prompt_variant,
                         parse_success=False,
                         planner_success=False,
                         plan_valid=False,
@@ -318,6 +363,7 @@ def evaluate_llm_planner(
                     make_row(
                         record=record,
                         method="llm_planner",
+                        prompt_variant=prompt_variant,
                         parse_success=True,
                         planner_success=False,
                         plan_valid=False,
@@ -346,6 +392,7 @@ def evaluate_llm_planner(
                     make_row(
                         record=record,
                         method="llm_planner",
+                        prompt_variant=prompt_variant,
                         parse_success=True,
                         planner_success=False,
                         plan_valid=False,
@@ -379,6 +426,7 @@ def evaluate_llm_planner(
                 make_row(
                     record=record,
                     method="llm_planner",
+                    prompt_variant=prompt_variant,
                     parse_success=True,
                     planner_success=True,
                     plan_valid=plan_valid,
@@ -401,6 +449,7 @@ def evaluate_llm_planner(
                 make_row(
                     record=record,
                     method="llm_planner",
+                    prompt_variant=prompt_variant,
                     parse_success=False,
                     planner_success=False,
                     plan_valid=False,
@@ -436,14 +485,29 @@ def main() -> None:
         action="store_true",
         help="Remove existing metrics file before writing",
     )
+    parser.add_argument(
+        "--results-dir",
+        default=None,
+        help=(
+            "Base directory for all output files. "
+            "If set, overrides --output, --llm-only-raw-dir, "
+            "--llm-planner-raw-dir, and --llm-planner-plan-dir "
+            "with paths derived from this directory."
+        ),
+    )
 
     parser.add_argument(
         "--llm-only-prompt",
-        default="src/prompts/llm_only_prompt.txt",
+        default="src/prompts/basic/llm_only_prompt.txt",
     )
     parser.add_argument(
         "--llm-planner-prompt",
-        default="src/prompts/llm_to_json_prompt.txt",
+        default="src/prompts/basic/llm_to_json_prompt.txt",
+    )
+    parser.add_argument(
+        "--prompt-variant",
+        default="basic",
+        help="Label stored in metrics.csv; does not affect prompt loading",
     )
 
     parser.add_argument(
@@ -484,6 +548,13 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    if args.results_dir is not None:
+        _base = Path(args.results_dir)
+        args.output = str(_base / "metrics.csv")
+        args.llm_only_raw_dir = str(_base / "raw_outputs" / "llm_only")
+        args.llm_planner_raw_dir = str(_base / "raw_outputs" / "llm_to_json")
+        args.llm_planner_plan_dir = str(_base / "plans" / "llm_to_json")
+
     output_path = Path(args.output)
 
     if args.reset:
@@ -500,6 +571,7 @@ def main() -> None:
                 records=records,
                 client=client,
                 prompt_path=Path(args.llm_only_prompt),
+                prompt_variant=args.prompt_variant,
                 raw_output_dir=Path(args.llm_only_raw_dir),
             )
         )
@@ -510,6 +582,7 @@ def main() -> None:
                 records=records,
                 client=client,
                 prompt_path=Path(args.llm_planner_prompt),
+                prompt_variant=args.prompt_variant,
                 domain_path=Path(args.domain),
                 raw_output_dir=Path(args.llm_planner_raw_dir),
                 pddl_output_dir=Path(args.llm_planner_pddl_dir),

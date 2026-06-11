@@ -2,5 +2,5 @@
 (put-down b)
 (pick-up d)
 (stack d b)
-(pick-up f)
+(unstack f e)
 (stack f a)

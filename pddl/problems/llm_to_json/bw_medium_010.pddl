@@ -1,4 +1,4 @@
-(define (problem bw_medium_008)
+(define (problem bw_medium_010)
   (:domain blocks-world)
 
   (:objects
@@ -7,18 +7,15 @@
 
   (:init
     (on_table a)
-    (on_table b)
     (on_table c)
-    (on_table d)
-    (on a b)
-    (clear a)
-    (clear b)
-    (clear c)
+    (on b a)
+    (on d b)
     (clear d)
+    (clear c)
     (handempty)
   )
 
   (:goal
-    (on d a)
+    (on c d)
   )
 )

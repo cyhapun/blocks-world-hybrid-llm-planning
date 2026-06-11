@@ -10,7 +10,7 @@
     (on_table d)
     (on b a)
     (on c b)
-    (on_table e)
+    (on e d)
     (clear c)
     (clear e)
     (handempty)

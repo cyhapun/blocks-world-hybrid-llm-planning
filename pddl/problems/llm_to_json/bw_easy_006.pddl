@@ -10,6 +10,8 @@
     (on b a)
     (on c b)
     (clear c)
+    (clear b)
+    (clear a)
     (handempty)
   )
 

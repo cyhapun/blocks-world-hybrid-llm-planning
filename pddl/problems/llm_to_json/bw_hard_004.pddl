@@ -6,11 +6,11 @@
   )
 
   (:init
-    (on_table d)
     (on_table b)
+    (on_table c)
+    (on_table d)
     (on_table e)
     (on a d)
-    (on c b)
     (clear a)
     (clear c)
     (clear e)
