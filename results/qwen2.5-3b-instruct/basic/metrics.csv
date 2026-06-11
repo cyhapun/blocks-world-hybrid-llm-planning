@@ -1,0 +1,81 @@
+id,difficulty,method,prompt_variant,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
+bw_easy_001,easy,llm_only,basic,True,,False,False,False,3,7.0967,precondition_violation
+bw_easy_002,easy,llm_only,basic,True,,False,False,False,5,3.1275,precondition_violation
+bw_easy_003,easy,llm_only,basic,True,,False,False,False,7,3.5060,precondition_violation
+bw_easy_004,easy,llm_only,basic,True,,False,False,False,6,3.4525,precondition_violation
+bw_easy_005,easy,llm_only,basic,True,,False,False,False,5,3.3594,precondition_violation
+bw_easy_006,easy,llm_only,basic,True,,False,False,False,13,4.1425,precondition_violation
+bw_easy_007,easy,llm_only,basic,True,,False,False,False,6,3.4661,precondition_violation
+bw_easy_008,easy,llm_only,basic,True,,False,False,False,4,3.2423,precondition_violation
+bw_easy_009,easy,llm_only,basic,True,,False,False,False,5,3.2484,precondition_violation
+bw_easy_010,easy,llm_only,basic,True,,False,False,False,7,3.5287,precondition_violation
+bw_easy_001,easy,llm_planner,basic,True,True,True,True,True,2,5.9892,
+bw_easy_002,easy,llm_planner,basic,False,False,False,False,False,0,4.8213,json_parse_error: Object '' in init does not exist in objects.
+bw_easy_003,easy,llm_planner,basic,False,False,False,False,False,0,4.7240,json_parse_error: Object '' in init does not exist in objects.
+bw_easy_004,easy,llm_planner,basic,False,False,False,False,False,0,4.5693,json_parse_error: Object '' in init does not exist in objects.
+bw_easy_005,easy,llm_planner,basic,False,False,False,False,False,0,4.8652,json_parse_error: Object '' in init does not exist in objects.
+bw_easy_006,easy,llm_planner,basic,True,False,False,False,False,0,4.6550,"planner_no_solution_file: 2026-06-09 21:56:35,621 INFO     24 Operators created | 2026-06-09 21:56:35,621 INFO     Search start: bw_easy_006 | 2026-06-09 21:56:35,621 INFO     Initial h value: inf | 2026-06-09 21:56:35,621 INFO     No operators left. Task unsolvable. | 2026-06-09 21:56:35,621 INFO     1 Nodes expanded | 2026-06-09 21:56:35,621 INFO     Search end: bw_easy_006 | 2026-06-09 21:56:35,621 INFO     Search time: 0.0 | 2026-06-09 21:56:35,621 WARNING  No solution could be found"
+bw_easy_007,easy,llm_planner,basic,False,False,False,False,False,0,4.8220,json_parse_error: Object '' in init does not exist in objects.
+bw_easy_008,easy,llm_planner,basic,True,False,False,False,False,0,4.8796,"planner_no_solution_file: 2026-06-09 21:56:45,322 INFO     24 Operators created | 2026-06-09 21:56:45,322 INFO     Search start: bw_easy_008 | 2026-06-09 21:56:45,323 INFO     Initial h value: inf | 2026-06-09 21:56:45,323 INFO     No operators left. Task unsolvable. | 2026-06-09 21:56:45,323 INFO     1 Nodes expanded | 2026-06-09 21:56:45,323 INFO     Search end: bw_easy_008 | 2026-06-09 21:56:45,323 INFO     Search time: 0.0 | 2026-06-09 21:56:45,323 WARNING  No solution could be found"
+bw_easy_009,easy,llm_planner,basic,False,False,False,False,False,0,5.1493,json_parse_error: Object '' in init does not exist in objects.
+bw_easy_010,easy,llm_planner,basic,False,False,False,False,False,0,4.8552,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_001,medium,llm_only,basic,True,,False,False,False,10,4.0369,unknown_object
+bw_medium_002,medium,llm_only,basic,True,,False,False,False,8,3.7266,precondition_violation
+bw_medium_003,medium,llm_only,basic,True,,False,False,False,8,3.7986,precondition_violation
+bw_medium_004,medium,llm_only,basic,True,,False,False,False,7,3.7069,precondition_violation
+bw_medium_005,medium,llm_only,basic,True,,False,False,False,8,3.7450,precondition_violation
+bw_medium_006,medium,llm_only,basic,True,,False,False,False,6,3.5534,precondition_violation
+bw_medium_007,medium,llm_only,basic,True,,False,False,False,8,3.7266,precondition_violation
+bw_medium_008,medium,llm_only,basic,True,,False,False,False,11,4.1931,precondition_violation
+bw_medium_009,medium,llm_only,basic,True,,False,False,False,6,3.5174,precondition_violation
+bw_medium_010,medium,llm_only,basic,True,,False,False,False,6,3.5181,precondition_violation
+bw_medium_011,medium,llm_only,basic,True,,False,False,False,6,3.5412,precondition_violation
+bw_medium_012,medium,llm_only,basic,True,,False,False,False,7,3.6450,precondition_violation
+bw_medium_013,medium,llm_only,basic,True,,False,False,False,7,3.6269,precondition_violation
+bw_medium_014,medium,llm_only,basic,True,,False,False,False,8,3.6954,precondition_violation
+bw_medium_015,medium,llm_only,basic,True,,False,False,False,7,3.6332,precondition_violation
+bw_medium_001,medium,llm_planner,basic,False,False,False,False,False,0,5.9168,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_002,medium,llm_planner,basic,False,False,False,False,False,0,5.4729,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_003,medium,llm_planner,basic,False,False,False,False,False,0,5.3625,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_004,medium,llm_planner,basic,False,False,False,False,False,0,5.2914,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_005,medium,llm_planner,basic,False,False,False,False,False,0,4.9769,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_006,medium,llm_planner,basic,False,False,False,False,False,0,5.1869,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_007,medium,llm_planner,basic,False,False,False,False,False,0,4.7921,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_008,medium,llm_planner,basic,False,False,False,False,False,0,5.0916,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_009,medium,llm_planner,basic,False,False,False,False,False,0,4.7858,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_010,medium,llm_planner,basic,False,False,False,False,False,0,5.0316,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_011,medium,llm_planner,basic,False,False,False,False,False,0,5.4331,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_012,medium,llm_planner,basic,False,False,False,False,False,0,5.2260,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_013,medium,llm_planner,basic,False,False,False,False,False,0,4.9783,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_014,medium,llm_planner,basic,False,False,False,False,False,0,5.4725,json_parse_error: Object 'D' in init does not exist in objects.
+bw_medium_015,medium,llm_planner,basic,False,False,False,False,False,0,5.2561,json_parse_error: Object 'D' in init does not exist in objects.
+bw_hard_001,hard,llm_only,basic,True,,False,False,False,9,3.8760,precondition_violation
+bw_hard_002,hard,llm_only,basic,True,,False,False,False,9,3.9180,precondition_violation
+bw_hard_003,hard,llm_only,basic,True,,False,False,False,9,3.9186,precondition_violation
+bw_hard_004,hard,llm_only,basic,True,,False,False,False,6,3.5412,precondition_violation
+bw_hard_005,hard,llm_only,basic,True,,False,False,False,5,3.4957,precondition_violation
+bw_hard_006,hard,llm_only,basic,True,,False,False,False,7,3.6895,precondition_violation
+bw_hard_007,hard,llm_only,basic,True,,False,False,False,7,3.7859,precondition_violation
+bw_hard_008,hard,llm_only,basic,True,,False,False,False,7,3.7366,precondition_violation
+bw_hard_009,hard,llm_only,basic,True,,False,False,False,14,4.6556,unknown_object
+bw_hard_010,hard,llm_only,basic,True,,False,False,False,8,3.6456,precondition_violation
+bw_hard_011,hard,llm_only,basic,True,,False,False,False,16,4.7869,precondition_violation
+bw_hard_012,hard,llm_only,basic,True,,False,False,False,7,3.7356,precondition_violation
+bw_hard_013,hard,llm_only,basic,True,,False,False,False,8,3.8906,precondition_violation
+bw_hard_014,hard,llm_only,basic,True,,False,False,False,8,3.8244,precondition_violation
+bw_hard_015,hard,llm_only,basic,True,,False,False,False,11,4.2543,precondition_violation
+bw_hard_001,hard,llm_planner,basic,False,False,False,False,False,0,6.4447,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_002,hard,llm_planner,basic,False,False,False,False,False,0,5.7999,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_003,hard,llm_planner,basic,True,False,False,False,False,0,5.9568,"planner_no_solution_file: 2026-06-09 22:00:28,148 INFO     60 Operators created | 2026-06-09 22:00:28,148 INFO     Search start: bw_hard_003 | 2026-06-09 22:00:28,148 INFO     Initial h value: inf | 2026-06-09 22:00:28,148 INFO     No operators left. Task unsolvable. | 2026-06-09 22:00:28,148 INFO     1 Nodes expanded | 2026-06-09 22:00:28,148 INFO     Search end: bw_hard_003 | 2026-06-09 22:00:28,148 INFO     Search time: 0.0 | 2026-06-09 22:00:28,148 WARNING  No solution could be found"
+bw_hard_004,hard,llm_planner,basic,False,False,False,False,False,0,6.2715,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_005,hard,llm_planner,basic,False,False,False,False,False,0,6.5175,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_006,hard,llm_planner,basic,False,False,False,False,False,0,6.4176,json_parse_error: Object 'E' in init does not exist in objects.
+bw_hard_007,hard,llm_planner,basic,False,False,False,False,False,0,6.4683,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_008,hard,llm_planner,basic,True,False,False,False,False,0,6.1525,"planner_no_solution_file: 2026-06-09 22:00:59,976 INFO     60 Operators created | 2026-06-09 22:00:59,976 INFO     Search start: bw_hard_008 | 2026-06-09 22:00:59,976 INFO     Initial h value: inf | 2026-06-09 22:00:59,977 INFO     No operators left. Task unsolvable. | 2026-06-09 22:00:59,977 INFO     1 Nodes expanded | 2026-06-09 22:00:59,977 INFO     Search end: bw_hard_008 | 2026-06-09 22:00:59,977 INFO     Search time: 0.0 | 2026-06-09 22:00:59,977 WARNING  No solution could be found"
+bw_hard_009,hard,llm_planner,basic,False,False,False,False,False,0,7.1622,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_010,hard,llm_planner,basic,True,True,False,False,False,5,6.6337,precondition_violation
+bw_hard_011,hard,llm_planner,basic,True,False,False,False,False,0,20.8364,"planner_no_solution_file: 2026-06-09 22:01:34,608 INFO     84 Operators created | 2026-06-09 22:01:34,608 INFO     Search start: bw_hard_011 | 2026-06-09 22:01:34,609 INFO     Initial h value: inf | 2026-06-09 22:01:34,610 INFO     No operators left. Task unsolvable. | 2026-06-09 22:01:34,610 INFO     1 Nodes expanded | 2026-06-09 22:01:34,610 INFO     Search end: bw_hard_011 | 2026-06-09 22:01:34,610 INFO     Search time: 0.0 | 2026-06-09 22:01:34,610 WARNING  No solution could be found"
+bw_hard_012,hard,llm_planner,basic,False,False,False,False,False,0,23.8059,json_parse_error: Object 'F' in init does not exist in objects.
+bw_hard_013,hard,llm_planner,basic,False,False,False,False,False,0,28.0834,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_014,hard,llm_planner,basic,False,False,False,False,False,0,30.2260,json_parse_error: Object 'TABLE' in init does not exist in objects.
+bw_hard_015,hard,llm_planner,basic,False,False,False,False,False,0,29.9077,json_parse_error: Object 'HANDEMPTY' in init does not exist in objects.

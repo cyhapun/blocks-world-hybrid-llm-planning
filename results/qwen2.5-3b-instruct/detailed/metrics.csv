@@ -1,0 +1,81 @@
+id,difficulty,method,prompt_variant,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
+bw_easy_001,easy,llm_only,detailed,True,,False,False,False,4,9.2700,precondition_violation
+bw_easy_002,easy,llm_only,detailed,True,,False,False,False,5,3.3032,precondition_violation
+bw_easy_003,easy,llm_only,detailed,True,,False,False,False,4,3.0837,precondition_violation
+bw_easy_004,easy,llm_only,detailed,True,,False,False,False,4,3.2349,precondition_violation
+bw_easy_005,easy,llm_only,detailed,True,,False,False,False,3,3.0943,precondition_violation
+bw_easy_006,easy,llm_only,detailed,True,,False,False,False,2,2.9012,precondition_violation
+bw_easy_007,easy,llm_only,detailed,True,,False,False,False,4,3.2776,precondition_violation
+bw_easy_008,easy,llm_only,detailed,True,,True,True,True,4,3.2021,
+bw_easy_009,easy,llm_only,detailed,True,,False,False,False,4,3.2766,precondition_violation
+bw_easy_010,easy,llm_only,detailed,True,,False,False,False,4,3.0979,precondition_violation
+bw_easy_001,easy,llm_planner,detailed,True,True,True,True,True,2,7.6007,
+bw_easy_002,easy,llm_planner,detailed,True,True,True,True,True,2,4.8810,
+bw_easy_003,easy,llm_planner,detailed,True,True,True,True,True,2,4.9936,
+bw_easy_004,easy,llm_planner,detailed,True,True,True,True,True,2,4.9767,
+bw_easy_005,easy,llm_planner,detailed,True,True,True,True,True,2,5.0653,
+bw_easy_006,easy,llm_planner,detailed,True,False,False,False,False,0,4.6108,"planner_no_solution_file: 2026-06-11 17:53:28,005 INFO     24 Operators created | 2026-06-11 17:53:28,005 INFO     Search start: bw_easy_006 | 2026-06-11 17:53:28,005 INFO     Initial h value: inf | 2026-06-11 17:53:28,005 INFO     No operators left. Task unsolvable. | 2026-06-11 17:53:28,005 INFO     1 Nodes expanded | 2026-06-11 17:53:28,005 INFO     Search end: bw_easy_006 | 2026-06-11 17:53:28,005 INFO     Search time: 0.0 | 2026-06-11 17:53:28,005 WARNING  No solution could be found"
+bw_easy_007,easy,llm_planner,detailed,True,True,True,True,True,4,4.9274,
+bw_easy_008,easy,llm_planner,detailed,True,True,True,True,True,2,5.1537,
+bw_easy_009,easy,llm_planner,detailed,True,True,True,True,True,2,4.8413,
+bw_easy_010,easy,llm_planner,detailed,True,True,True,True,True,4,5.0426,
+bw_medium_001,medium,llm_only,detailed,True,,False,False,False,4,3.3647,precondition_violation
+bw_medium_002,medium,llm_only,detailed,True,,False,False,False,6,3.4420,precondition_violation
+bw_medium_003,medium,llm_only,detailed,True,,False,False,False,5,3.3229,precondition_violation
+bw_medium_004,medium,llm_only,detailed,True,,False,False,False,8,3.7609,precondition_violation
+bw_medium_005,medium,llm_only,detailed,True,,True,True,True,4,3.3502,
+bw_medium_006,medium,llm_only,detailed,True,,False,False,False,6,3.4785,precondition_violation
+bw_medium_007,medium,llm_only,detailed,True,,False,False,False,5,3.4008,precondition_violation
+bw_medium_008,medium,llm_only,detailed,True,,False,False,False,4,3.3231,precondition_violation
+bw_medium_009,medium,llm_only,detailed,True,,False,False,False,4,3.2856,precondition_violation
+bw_medium_010,medium,llm_only,detailed,True,,True,True,True,4,3.2246,
+bw_medium_011,medium,llm_only,detailed,True,,False,False,False,4,3.2020,precondition_violation
+bw_medium_012,medium,llm_only,detailed,True,,True,True,True,4,3.2161,
+bw_medium_013,medium,llm_only,detailed,True,,False,False,False,4,3.2096,precondition_violation
+bw_medium_014,medium,llm_only,detailed,True,,False,False,False,7,3.5945,precondition_violation
+bw_medium_015,medium,llm_only,detailed,True,,False,False,False,8,3.7005,goal_not_achieved
+bw_medium_001,medium,llm_planner,detailed,True,True,True,True,True,4,5.9550,
+bw_medium_002,medium,llm_planner,detailed,True,True,True,True,True,2,5.6094,
+bw_medium_003,medium,llm_planner,detailed,True,False,False,False,False,0,5.2497,"planner_no_solution_file: 2026-06-11 17:54:56,650 INFO     40 Operators created | 2026-06-11 17:54:56,650 INFO     Search start: bw_medium_003 | 2026-06-11 17:54:56,650 INFO     Initial h value: inf | 2026-06-11 17:54:56,650 INFO     No operators left. Task unsolvable. | 2026-06-11 17:54:56,650 INFO     1 Nodes expanded | 2026-06-11 17:54:56,650 INFO     Search end: bw_medium_003 | 2026-06-11 17:54:56,650 INFO     Search time: 0.0 | 2026-06-11 17:54:56,650 WARNING  No solution could be found"
+bw_medium_004,medium,llm_planner,detailed,True,True,True,True,True,2,5.3418,
+bw_medium_005,medium,llm_planner,detailed,True,True,True,True,True,2,5.7995,
+bw_medium_006,medium,llm_planner,detailed,True,True,False,False,False,4,6.0125,precondition_violation
+bw_medium_007,medium,llm_planner,detailed,True,False,False,False,False,0,5.5576,"planner_no_solution_file: 2026-06-11 17:55:19,360 INFO     40 Operators created | 2026-06-11 17:55:19,360 INFO     Search start: bw_medium_007 | 2026-06-11 17:55:19,360 INFO     Initial h value: inf | 2026-06-11 17:55:19,360 INFO     No operators left. Task unsolvable. | 2026-06-11 17:55:19,360 INFO     1 Nodes expanded | 2026-06-11 17:55:19,360 INFO     Search end: bw_medium_007 | 2026-06-11 17:55:19,360 INFO     Search time: 0.0 | 2026-06-11 17:55:19,360 WARNING  No solution could be found"
+bw_medium_008,medium,llm_planner,detailed,False,False,False,False,False,0,5.6730,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_009,medium,llm_planner,detailed,True,True,True,True,True,2,5.4328,
+bw_medium_010,medium,llm_planner,detailed,True,False,False,False,False,0,5.3096,"planner_no_solution_file: 2026-06-11 17:55:35,777 INFO     40 Operators created | 2026-06-11 17:55:35,778 INFO     Search start: bw_medium_010 | 2026-06-11 17:55:35,778 INFO     Initial h value: inf | 2026-06-11 17:55:35,778 INFO     No operators left. Task unsolvable. | 2026-06-11 17:55:35,778 INFO     1 Nodes expanded | 2026-06-11 17:55:35,778 INFO     Search end: bw_medium_010 | 2026-06-11 17:55:35,778 INFO     Search time: 0.0 | 2026-06-11 17:55:35,778 WARNING  No solution could be found"
+bw_medium_011,medium,llm_planner,detailed,False,False,False,False,False,0,5.4989,json_parse_error: Object '' in init does not exist in objects.
+bw_medium_012,medium,llm_planner,detailed,True,False,False,False,False,0,5.8225,"planner_no_solution_file: 2026-06-11 17:55:47,099 INFO     40 Operators created | 2026-06-11 17:55:47,099 INFO     Search start: bw_medium_012 | 2026-06-11 17:55:47,099 INFO     Initial h value: inf | 2026-06-11 17:55:47,099 INFO     No operators left. Task unsolvable. | 2026-06-11 17:55:47,099 INFO     1 Nodes expanded | 2026-06-11 17:55:47,099 INFO     Search end: bw_medium_012 | 2026-06-11 17:55:47,099 INFO     Search time: 0.0 | 2026-06-11 17:55:47,099 WARNING  No solution could be found"
+bw_medium_013,medium,llm_planner,detailed,True,False,False,False,False,0,5.2441,"planner_no_solution_file: 2026-06-11 17:55:52,343 INFO     40 Operators created | 2026-06-11 17:55:52,343 INFO     Search start: bw_medium_013 | 2026-06-11 17:55:52,343 INFO     Initial h value: inf | 2026-06-11 17:55:52,343 INFO     No operators left. Task unsolvable. | 2026-06-11 17:55:52,343 INFO     1 Nodes expanded | 2026-06-11 17:55:52,343 INFO     Search end: bw_medium_013 | 2026-06-11 17:55:52,343 INFO     Search time: 0.0 | 2026-06-11 17:55:52,343 WARNING  No solution could be found"
+bw_medium_014,medium,llm_planner,detailed,True,False,False,False,False,0,5.2175,"planner_no_solution_file: 2026-06-11 17:55:57,560 INFO     40 Operators created | 2026-06-11 17:55:57,560 INFO     Search start: bw_medium_014 | 2026-06-11 17:55:57,560 INFO     Initial h value: inf | 2026-06-11 17:55:57,560 INFO     No operators left. Task unsolvable. | 2026-06-11 17:55:57,560 INFO     1 Nodes expanded | 2026-06-11 17:55:57,561 INFO     Search end: bw_medium_014 | 2026-06-11 17:55:57,561 INFO     Search time: 0.0 | 2026-06-11 17:55:57,561 WARNING  No solution could be found"
+bw_medium_015,medium,llm_planner,detailed,True,True,True,True,True,4,5.8737,
+bw_hard_001,hard,llm_only,detailed,True,,False,False,False,9,3.8621,precondition_violation
+bw_hard_002,hard,llm_only,detailed,True,,False,False,False,7,3.7027,precondition_violation
+bw_hard_003,hard,llm_only,detailed,True,,False,False,False,7,3.6988,precondition_violation
+bw_hard_004,hard,llm_only,detailed,True,,False,False,False,6,3.5988,precondition_violation
+bw_hard_005,hard,llm_only,detailed,True,,False,False,False,6,3.6112,precondition_violation
+bw_hard_006,hard,llm_only,detailed,True,,False,False,False,6,3.6297,precondition_violation
+bw_hard_007,hard,llm_only,detailed,True,,False,False,False,4,3.3323,precondition_violation
+bw_hard_008,hard,llm_only,detailed,True,,False,False,False,7,3.7136,precondition_violation
+bw_hard_009,hard,llm_only,detailed,True,,False,False,False,8,3.7437,precondition_violation
+bw_hard_010,hard,llm_only,detailed,True,,False,False,False,8,3.8852,precondition_violation
+bw_hard_011,hard,llm_only,detailed,True,,False,False,False,9,3.9863,precondition_violation
+bw_hard_012,hard,llm_only,detailed,True,,False,False,False,8,3.8371,precondition_violation
+bw_hard_013,hard,llm_only,detailed,True,,False,False,False,5,3.4800,precondition_violation
+bw_hard_014,hard,llm_only,detailed,True,,False,False,False,6,3.5798,precondition_violation
+bw_hard_015,hard,llm_only,detailed,True,,False,False,False,7,3.7104,precondition_violation
+bw_hard_001,hard,llm_planner,detailed,True,True,True,True,True,10,6.8452,
+bw_hard_002,hard,llm_planner,detailed,True,False,False,False,False,0,6.4042,"planner_no_solution_file: 2026-06-11 17:57:13,073 INFO     60 Operators created | 2026-06-11 17:57:13,073 INFO     Search start: bw_hard_002 | 2026-06-11 17:57:13,073 INFO     Initial h value: inf | 2026-06-11 17:57:13,074 INFO     No operators left. Task unsolvable. | 2026-06-11 17:57:13,074 INFO     1 Nodes expanded | 2026-06-11 17:57:13,074 INFO     Search end: bw_hard_002 | 2026-06-11 17:57:13,074 INFO     Search time: 0.0 | 2026-06-11 17:57:13,074 WARNING  No solution could be found"
+bw_hard_003,hard,llm_planner,detailed,True,True,False,False,False,3,6.4853,precondition_violation
+bw_hard_004,hard,llm_planner,detailed,True,False,False,False,False,0,6.2246,"planner_no_solution_file: 2026-06-11 17:57:25,782 INFO     60 Operators created | 2026-06-11 17:57:25,782 INFO     Search start: bw_hard_004 | 2026-06-11 17:57:25,783 INFO     Initial h value: inf | 2026-06-11 17:57:25,783 INFO     No operators left. Task unsolvable. | 2026-06-11 17:57:25,783 INFO     1 Nodes expanded | 2026-06-11 17:57:25,783 INFO     Search end: bw_hard_004 | 2026-06-11 17:57:25,783 INFO     Search time: 0.0 | 2026-06-11 17:57:25,783 WARNING  No solution could be found"
+bw_hard_005,hard,llm_planner,detailed,True,False,False,False,False,0,5.9395,"planner_no_solution_file: 2026-06-11 17:57:31,724 INFO     60 Operators created | 2026-06-11 17:57:31,724 INFO     Search start: bw_hard_005 | 2026-06-11 17:57:31,724 INFO     Initial h value: inf | 2026-06-11 17:57:31,724 INFO     No operators left. Task unsolvable. | 2026-06-11 17:57:31,724 INFO     1 Nodes expanded | 2026-06-11 17:57:31,724 INFO     Search end: bw_hard_005 | 2026-06-11 17:57:31,724 INFO     Search time: 0.0 | 2026-06-11 17:57:31,724 WARNING  No solution could be found"
+bw_hard_006,hard,llm_planner,detailed,True,True,True,True,True,4,6.7331,
+bw_hard_007,hard,llm_planner,detailed,True,False,False,False,False,0,6.5486,"planner_no_solution_file: 2026-06-11 17:57:44,761 INFO     60 Operators created | 2026-06-11 17:57:44,761 INFO     Search start: bw_hard_007 | 2026-06-11 17:57:44,761 INFO     Initial h value: 4.000000 | 2026-06-11 17:57:45,005 INFO     No operators left. Task unsolvable. | 2026-06-11 17:57:45,005 INFO     933 Nodes expanded | 2026-06-11 17:57:45,005 INFO     Search end: bw_hard_007 | 2026-06-11 17:57:45,005 INFO     Search time: 0.25 | 2026-06-11 17:57:45,006 WARNING  No solution could be found"
+bw_hard_008,hard,llm_planner,detailed,True,True,True,True,True,6,6.3758,
+bw_hard_009,hard,llm_planner,detailed,True,True,True,True,True,6,7.5323,
+bw_hard_010,hard,llm_planner,detailed,True,True,True,True,True,6,6.7600,
+bw_hard_011,hard,llm_planner,detailed,False,False,False,False,False,0,7.2217,json_parse_error: Object '' in init does not exist in objects.
+bw_hard_012,hard,llm_planner,detailed,True,True,True,True,True,6,6.7448,
+bw_hard_013,hard,llm_planner,detailed,True,True,True,True,True,6,6.6975,
+bw_hard_014,hard,llm_planner,detailed,True,False,False,False,False,0,5.9465,"planner_no_solution_file: 2026-06-11 17:58:32,285 INFO     84 Operators created | 2026-06-11 17:58:32,285 INFO     Search start: bw_hard_014 | 2026-06-11 17:58:32,285 INFO     Initial h value: inf | 2026-06-11 17:58:32,285 INFO     No operators left. Task unsolvable. | 2026-06-11 17:58:32,285 INFO     1 Nodes expanded | 2026-06-11 17:58:32,285 INFO     Search end: bw_hard_014 | 2026-06-11 17:58:32,285 INFO     Search time: 0.0 | 2026-06-11 17:58:32,285 WARNING  No solution could be found"
+bw_hard_015,hard,llm_planner,detailed,True,False,False,False,False,0,32.1422,"planner_no_solution_file: 2026-06-11 17:59:04,422 INFO     84 Operators created | 2026-06-11 17:59:04,422 INFO     Search start: bw_hard_015 | 2026-06-11 17:59:04,422 INFO     Initial h value: inf | 2026-06-11 17:59:04,423 INFO     No operators left. Task unsolvable. | 2026-06-11 17:59:04,423 INFO     1 Nodes expanded | 2026-06-11 17:59:04,423 INFO     Search end: bw_hard_015 | 2026-06-11 17:59:04,423 INFO     Search time: 0.0 | 2026-06-11 17:59:04,424 WARNING  No solution could be found"
