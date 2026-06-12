@@ -23,8 +23,8 @@
 
   (:goal
     (and
-      (on b c)
       (on a b)
+      (on b c)
       (on d e)
     )
   )

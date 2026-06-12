@@ -8,10 +8,8 @@
   (:init
     (on_table a)
     (on_table b)
-    (on_table c)
-    (on a b)
     (clear a)
-    (clear a)
+    (clear b)
     (clear c)
     (handempty)
   )

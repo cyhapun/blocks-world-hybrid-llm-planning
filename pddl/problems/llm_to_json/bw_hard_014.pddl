@@ -11,7 +11,7 @@
     (on_table e)
     (on a c)
     (on b a)
-    (on_table f)
+    (on f e)
     (clear b)
     (clear d)
     (clear f)

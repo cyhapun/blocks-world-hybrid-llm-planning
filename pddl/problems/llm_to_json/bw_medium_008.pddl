@@ -12,7 +12,7 @@
     (on_table d)
     (on a b)
     (clear a)
-    (clear a)
+    (clear b)
     (clear c)
     (clear d)
     (handempty)

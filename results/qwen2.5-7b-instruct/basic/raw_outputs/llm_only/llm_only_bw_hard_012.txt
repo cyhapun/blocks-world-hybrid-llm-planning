@@ -1,0 +1,6 @@
+pick-up F
+stack C D
+put-down C
+pick-up B
+stack B E
+put-down B

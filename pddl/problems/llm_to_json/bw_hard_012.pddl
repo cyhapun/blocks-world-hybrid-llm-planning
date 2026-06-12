@@ -6,15 +6,18 @@
   )
 
   (:init
-    (on_table f)
     (on_table a)
+    (on_table b)
     (on_table c)
+    (on_table d)
+    (on_table e)
+    (on_table f)
+    (clear b)
+    (clear c)
+    (clear d)
     (on e f)
     (on d e)
     (on b a)
-    (clear d)
-    (clear b)
-    (clear c)
     (handempty)
   )
 

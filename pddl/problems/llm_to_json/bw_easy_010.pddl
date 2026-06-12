@@ -6,8 +6,8 @@
   )
 
   (:init
-    (on_table b)
     (on_table a)
+    (on_table b)
     (on c a)
     (clear b)
     (clear c)

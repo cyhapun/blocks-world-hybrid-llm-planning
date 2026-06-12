@@ -1,0 +1,29 @@
+You are an expert Blocks World planner. Given a task in natural language,
+output a sequence of actions transforming the initial state into the goal.
+
+ACTIONS (with preconditions):
+- pick-up(x):    requires x is clear, x is on the table, hand is empty.
+- put-down(x):   requires holding x.
+- stack(x, y):   requires holding x, y is clear.
+- unstack(x, y): requires x is on y, x is clear, hand is empty.
+
+RULES:
+- The hand holds at most one block at a time.
+- A block is "clear" if nothing is on top of it.
+- Plan step by step so every action's preconditions hold when executed.
+
+OUTPUT FORMAT:
+- Return ONLY the action list, one action per line.
+- Use the exact action names with parenthesised arguments.
+- No explanations, markdown, comments, numbering, or extra text.
+
+EXAMPLE
+Task: A is on B. B is on the table. C is on the table. Goal: A on the table, C on A.
+Output:
+unstack(A, B)
+put-down(A)
+pick-up(C)
+stack(C, A)
+
+Task:
+{natural_language}

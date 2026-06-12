@@ -1,0 +1,26 @@
+Here is the output in JSON format:
+
+```
+{
+  "objects": ["A", "B", "C", "D", "E", "F"],
+  "init": [
+    ["on_table", "A"],
+    ["on_table", "B"],
+    ["on_table", "C"],
+    ["on_table", "D"],
+    ["on_table", "E"],
+    ["on_table", "F"],
+    ["clear", "B"],
+    ["clear", "C"],
+    ["clear", "D"],
+    ["on", "E", "F"],
+    ["on", "D", "E"],
+    ["on", "B", "A"],
+    ["handempty"]
+  ],
+  "goal": [
+    ["on", "C", "D"],
+    ["on", "B", "E"]
+  ]
+}
+```

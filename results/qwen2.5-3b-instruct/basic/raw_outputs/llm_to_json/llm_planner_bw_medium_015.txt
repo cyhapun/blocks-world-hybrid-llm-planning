@@ -1,0 +1,15 @@
+{
+  "objects": ["A", "B", "C"],
+  "init": [
+    ["on_table", "A"],
+    ["on", "D", "C"],
+    ["clear", "B"],
+    ["clear", "C"],
+    ["holding", "D"],
+    ["handempty"]
+  ],
+  "goal": [
+    ["on", "A", "D"],
+    ["on", "B", "A"]
+  ]
+}

@@ -1,0 +1,7 @@
+stack(A, B)
+pick-up(B)
+put-down(B)
+stack(E, D)
+pick-up(D)
+unstack(D, C)
+stack(C, E)
