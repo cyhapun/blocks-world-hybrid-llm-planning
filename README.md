@@ -1,11 +1,11 @@
-# Demo Blocks World LLM + Symbolic Planner
+# Blocks World – Hybrid LLM Planning
 
 Dự án này đánh giá khả năng lập kế hoạch trên các bài toán Blocks World bằng hai cách tiếp cận:
 
 1. **LLM-only**: mô hình ngôn ngữ trực tiếp tạo kế hoạch hành động từ một nhiệm vụ bằng ngôn ngữ tự nhiên.
 2. **LLM + symbolic planner**: mô hình ngôn ngữ phân tích nhiệm vụ ngôn ngữ tự nhiên thành JSON có cấu trúc, backend chuyển JSON thành PDDL, và `pyperplan` tạo kế hoạch cuối cùng.
 
-Demo chính tập trung vào cách tiếp cận thứ hai:
+Hệ thống hỗ trợ so sánh đa mô hình (Qwen 2.5 3B, Qwen 2.5 7B, Llama 3.1 8B) với hai biến thể prompt (basic, detailed).
 
 ```text
 Natural language task
@@ -36,7 +36,9 @@ LLM
           ↓
     validate_plan.py
           ↓
-  results/metrics.csv
+  results/<model>/<prompt_variant>/metrics.csv
+          ↓
+  viz_analysis.py (notebook) + visualize.py (CLI)
           ↓
   visualization + Streamlit demo
 ```
@@ -47,14 +49,18 @@ Các thành phần chính:
 |---|---|
 | `data/*.jsonl` | Các bài toán benchmark Blocks World |
 | `pddl/domain_blocks_world.pddl` | Domain PDDL cho Blocks World |
-| `src/validate_plan.py` | Bộ kiểm tra kế hoạch nội bộ |
-| `src/json_to_pddl.py` | Chuyển đổi bài toán JSON sang PDDL |
-| `src/run_planner.py` | Chạy `pyperplan` |
+| `src/llm_client.py` | Client LLM thống nhất (Hugging Face / local API) |
 | `src/llm_only_baseline.py` | Chạy lập kế hoạch LLM-only |
 | `src/llm_to_json.py` | Chạy lập kế hoạch LLM-to-JSON-to-PDDL |
-| `src/evaluate.py` | Trình chạy đánh giá thống nhất |
-| `src/visualize.py` | Tạo hình kết quả |
+| `src/json_to_pddl.py` | Chuyển đổi bài toán JSON sang PDDL |
+| `src/run_planner.py` | Chạy `pyperplan` |
+| `src/validate_plan.py` | Bộ kiểm tra kế hoạch nội bộ |
+| `src/evaluate.py` | Trình chạy đánh giá thống nhất (hỗ trợ multi-prompt) |
+| `src/visualize.py` | Tạo figures cơ bản từ CLI |
+| `src/viz_analysis.py` | Phân tích trực quan đa mô hình/đa prompt (dùng trong notebook) |
 | `src/render_plan.py` | Render các trace kế hoạch định tính |
+| `src/prompts/` | Thư mục chứa prompt templates (basic/ và detailed/) |
+| `notebook/analysis.ipynb` | Notebook phân tích kết quả thí nghiệm |
 | `app/streamlit_app.py` | Ứng dụng demo tương tác |
 
 ## 2. Cấu trúc repository
@@ -74,10 +80,11 @@ Các thành phần chính:
 │   ├── metrics.md
 │   ├── experiment_protocol.md
 │   └── troubleshooting.md
+├── notebook/
+│   └── analysis.ipynb
 ├── pddl/
 │   ├── domain_blocks_world.pddl
-│   ├── problems/
-│   └── generated_problems/
+│   └── problems/
 ├── src/
 │   ├── generate_dataset.py
 │   ├── check_dataset.py
@@ -89,14 +96,33 @@ Các thành phần chính:
 │   ├── validate_plan.py
 │   ├── evaluate.py
 │   ├── visualize.py
-│   └── render_plan.py
+│   ├── viz_analysis.py
+│   ├── render_plan.py
+│   └── prompts/
+│       ├── basic/
+│       │   ├── llm_only_prompt.txt
+│       │   └── llm_to_json_prompt.txt
+│       └── detailed/
+│           ├── llm_only_prompt.txt
+│           └── llm_to_json_prompt.txt
 ├── results/
+│   ├── metrics.csv
+│   ├── figures/
 │   ├── raw_outputs/
 │   ├── plans/
-│   ├── metrics.csv
-│   └── figures/
+│   ├── qwen2.5-3b-instruct/
+│   │   ├── basic/
+│   │   └── detailed/
+│   ├── qwen2.5-7b-instruct/
+│   │   ├── basic/
+│   │   └── detailed/
+│   └── llama3.1-8b/
+│       ├── basic/
+│       └── detailed/
 ├── tests/
-│   └── test_validator.py
+│   ├── test_validator.py
+│   ├── test_evaluate_metrics.py
+│   └── test_viz_analysis.py
 └── app/
     └── streamlit_app.py
 ```
@@ -125,7 +151,7 @@ Kiểm tra cài đặt:
 
 ```bash
 python -m py_compile src/validate_plan.py src/evaluate.py app/streamlit_app.py
-pytest tests/test_validator.py
+pytest tests/
 ```
 
 ## 4. Cấu hình API
@@ -135,7 +161,7 @@ Dự án hỗ trợ hai backend LLM:
 | Backend | Mô tả |
 |---|---|
 | `hf` | Hugging Face Inference API |
-| `local` | API local tương thích OpenAI |
+| `local` | API local tương thích OpenAI (vLLM, Ollama, ...) |
 
 Tạo file môi trường cục bộ:
 
@@ -166,9 +192,9 @@ Không commit `.env`.
 Các file dataset:
 
 ```text
-data/blocks_world_easy.jsonl
-data/blocks_world_medium.jsonl
-data/blocks_world_hard.jsonl
+data/blocks_world_easy.jsonl      (10 bài)
+data/blocks_world_medium.jsonl    (15 bài)
+data/blocks_world_hard.jsonl      (15 bài)
 ```
 
 Mỗi dòng là một bài toán JSON:
@@ -201,7 +227,21 @@ python src/check_dataset.py --data data/blocks_world_medium.jsonl
 python src/check_dataset.py --data data/blocks_world_hard.jsonl
 ```
 
-## 6. Chạy từng phương pháp riêng lẻ
+## 6. Prompt Variants
+
+Dự án hỗ trợ hai biến thể prompt:
+
+| Variant | Đường dẫn | Mô tả |
+|---|---|---|
+| `basic` | `src/prompts/basic/` | Prompt ngắn gọn, chỉ chứa hướng dẫn cơ bản |
+| `detailed` | `src/prompts/detailed/` | Prompt chi tiết với ví dụ và ràng buộc cụ thể |
+
+Mỗi variant chứa hai file prompt:
+
+- `llm_only_prompt.txt` – dùng cho phương pháp LLM-only
+- `llm_to_json_prompt.txt` – dùng cho phương pháp LLM + planner
+
+## 7. Chạy từng phương pháp riêng lẻ
 
 ### LLM-only
 
@@ -231,41 +271,65 @@ results/plans/llm_to_json/
 results/llm_planner_results.csv
 ```
 
-## 7. Chạy đánh giá thống nhất
+## 8. Chạy đánh giá thống nhất
 
-Chạy một phương pháp:
+### Chạy một cấu hình đơn
 
 ```bash
 python src/evaluate.py --method llm_only --data data/blocks_world_easy.jsonl --limit 3 --reset
 python src/evaluate.py --method llm_planner --data data/blocks_world_easy.jsonl --limit 3 --reset
 ```
 
-Chạy cả hai phương pháp:
+### Chạy cả hai phương pháp
 
 ```bash
 python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --limit 3 --reset
 ```
 
-Chạy toàn bộ thí nghiệm:
+### Chạy với prompt variant khác nhau
+
+Sử dụng `--prompt-variant`, `--llm-only-prompt`, `--llm-planner-prompt`, và `--results-dir` để phân tách kết quả:
 
 ```bash
-python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
-python src/evaluate.py --method all --data data/blocks_world_medium.jsonl
-python src/evaluate.py --method all --data data/blocks_world_hard.jsonl
+# Basic prompt
+python src/evaluate.py --method all \
+  --data data/blocks_world_easy.jsonl \
+  --prompt-variant basic \
+  --llm-only-prompt src/prompts/basic/llm_only_prompt.txt \
+  --llm-planner-prompt src/prompts/basic/llm_to_json_prompt.txt \
+  --results-dir results/qwen2.5-7b-instruct/basic \
+  --reset
+
+# Detailed prompt
+python src/evaluate.py --method all \
+  --data data/blocks_world_easy.jsonl \
+  --prompt-variant detailed \
+  --llm-only-prompt src/prompts/detailed/llm_only_prompt.txt \
+  --llm-planner-prompt src/prompts/detailed/llm_to_json_prompt.txt \
+  --results-dir results/qwen2.5-7b-instruct/detailed \
+  --reset
+```
+
+### Chạy toàn bộ thí nghiệm (một model, một prompt variant)
+
+```bash
+python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --results-dir results/<model>/<variant> --prompt-variant <variant> --llm-only-prompt src/prompts/<variant>/llm_only_prompt.txt --llm-planner-prompt src/prompts/<variant>/llm_to_json_prompt.txt --reset
+python src/evaluate.py --method all --data data/blocks_world_medium.jsonl --results-dir results/<model>/<variant> --prompt-variant <variant> --llm-only-prompt src/prompts/<variant>/llm_only_prompt.txt --llm-planner-prompt src/prompts/<variant>/llm_to_json_prompt.txt
+python src/evaluate.py --method all --data data/blocks_world_hard.jsonl --results-dir results/<model>/<variant> --prompt-variant <variant> --llm-only-prompt src/prompts/<variant>/llm_only_prompt.txt --llm-planner-prompt src/prompts/<variant>/llm_to_json_prompt.txt
 ```
 
 Output thống nhất:
 
 ```text
-results/metrics.csv
+results/<model>/<variant>/metrics.csv
 ```
 
-## 8. Metrics
+## 9. Metrics
 
-`results/metrics.csv` sử dụng các cột sau:
+`metrics.csv` sử dụng các cột sau:
 
 ```csv
-id,difficulty,method,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
+id,difficulty,method,prompt_variant,parse_success,planner_success,plan_valid,goal_achieved,success,plan_length,runtime,error_type
 ```
 
 Các metric chính:
@@ -280,10 +344,13 @@ Các metric chính:
 | `plan_length` | Số lượng action |
 | `runtime` | Thời gian chạy tính bằng giây |
 | `error_type` | Loại lỗi |
+| `prompt_variant` | Biến thể prompt đã sử dụng (basic / detailed) |
 
 Xem `docs/metrics.md` để biết chi tiết.
 
-## 9. Tạo figures
+## 10. Tạo figures
+
+### Figures cơ bản (CLI)
 
 ```bash
 python src/visualize.py --metrics results/metrics.csv
@@ -298,13 +365,25 @@ results/figures/error_distribution.png
 results/figures/avg_plan_length.png
 ```
 
+### Phân tích đa mô hình (Notebook)
+
+Sử dụng `notebook/analysis.ipynb` cùng với module `src/viz_analysis.py` để phân tích so sánh đa mô hình, đa prompt. Module này hỗ trợ:
+
+- Tải và ghép metrics từ tất cả các cấu hình (model × prompt variant)
+- Heatmap success rate theo factorial 3 yếu tố
+- Main effect của method, model, prompt
+- Prompt delta và sensitivity analysis
+- Difficulty scaling
+- Funnel analysis (pipeline stage pass rate)
+- Phân bố lỗi faceted theo model
+
 Render một qualitative plan trace:
 
 ```bash
 python src/render_plan.py --problem-id bw_easy_001
 ```
 
-## 10. Chạy Streamlit Demo
+## 11. Chạy Streamlit Demo
 
 ```bash
 streamlit run app/streamlit_app.py
@@ -324,7 +403,7 @@ streamlit run app/streamlit_app.py
 
 Ứng dụng đọc credentials từ `.env`.
 
-## 11. Các lỗi thường gặp
+## 12. Các lỗi thường gặp
 
 ### `HF_TOKEN` bị thiếu
 
@@ -365,13 +444,29 @@ pip install -r requirements.txt
 
 Thông tin chi tiết hơn có trong `docs/troubleshooting.md`.
 
-## 12. Tài liệu
+## 13. Tests
+
+Chạy toàn bộ test suite:
+
+```bash
+pytest tests/
+```
+
+Các file test hiện có:
+
+| File | Mô tả |
+|---|---|
+| `tests/test_validator.py` | Kiểm tra logic validate kế hoạch |
+| `tests/test_evaluate_metrics.py` | Kiểm tra ghi/đọc metrics CSV và migration schema |
+| `tests/test_viz_analysis.py` | Kiểm tra load dữ liệu và các plot helpers |
+
+## 14. Tài liệu
 
 Tài liệu bổ sung:
 
 ```text
-docs/demo_design.md
-docs/metrics.md
-docs/experiment_protocol.md
-docs/troubleshooting.md
+docs/demo_design.md           Thiết kế demo và luồng trình bày
+docs/metrics.md                Định nghĩa các chỉ số đánh giá
+docs/experiment_protocol.md    Quy trình tái tạo thí nghiệm
+docs/troubleshooting.md        Khắc phục sự cố thường gặp
 ```

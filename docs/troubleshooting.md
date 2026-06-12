@@ -1,4 +1,4 @@
-    # Khắc Phục Sự Cố
+# Khắc Phục Sự Cố
 
 ## 1. Sai môi trường Python
 
@@ -116,6 +116,12 @@ Output nên có dạng:
 }
 ```
 
+Nếu sử dụng multi-config, kiểm tra raw output tại:
+
+```bash
+cat results/<model>/<prompt_variant>/raw_outputs/llm_to_json/<file>.txt
+```
+
 ## 5. Planner không tìm thấy lời giải
 
 ### Triệu chứng
@@ -156,7 +162,23 @@ Chạy pyperplan trực tiếp:
 python -m pyperplan -H hff -s gbf pddl/domain_blocks_world.pddl pddl/problems/llm_to_json/<problem_id>.pddl
 ```
 
-## 6. Vi phạm tiền điều kiện
+## 6. Lỗi tạo PDDL
+
+### Triệu chứng
+
+```text
+pddl_generation_error
+```
+
+### Ý nghĩa
+
+JSON do LLM tạo ra được parse thành công nhưng quá trình chuyển sang PDDL bị lỗi (ví dụ thiếu trường, objects không khớp).
+
+### Debug
+
+Kiểm tra raw JSON output và so sánh với schema mong đợi trong `docs/troubleshooting.md` mục 4.
+
+## 7. Vi phạm tiền điều kiện
 
 ### Triệu chứng
 
@@ -184,7 +206,7 @@ Render kế hoạch:
 python src/render_plan.py --problem-id <problem_id> --plan <plan_file>
 ```
 
-## 7. Mục tiêu không đạt được
+## 8. Mục tiêu không đạt được
 
 ### Triệu chứng
 
@@ -204,7 +226,7 @@ Kiểm tra trạng thái cuối trong output của validator:
 python src/validate_plan.py --problem-id <problem_id> --plan <plan_file>
 ```
 
-## 8. Metrics rỗng hoặc bị trùng lặp
+## 9. Metrics rỗng hoặc bị trùng lặp
 
 ### Triệu chứng
 
@@ -227,7 +249,30 @@ python src/evaluate.py --method all --data data/blocks_world_medium.jsonl
 python src/evaluate.py --method all --data data/blocks_world_hard.jsonl
 ```
 
-## 9. Streamlit App không khởi động
+Khi dùng multi-config, `--reset` chỉ xóa file tại `--results-dir`, không ảnh hưởng các config khác.
+
+## 10. Schema metrics không khớp
+
+### Triệu chứng
+
+```text
+Unexpected metrics schema
+```
+
+### Ý nghĩa
+
+File metrics CSV có schema không phải legacy (thiếu `prompt_variant`) cũng không phải current.
+
+### Cách sửa
+
+Xóa file metrics cũ và chạy lại với `--reset`:
+
+```bash
+del results/metrics.csv
+python src/evaluate.py --method all --data data/blocks_world_easy.jsonl --reset
+```
+
+## 11. Streamlit App không khởi động
 
 ### Triệu chứng
 
@@ -249,6 +294,6 @@ Chạy:
 streamlit run app/streamlit_app.py
 ```
 
-## 10. Raw logs quá dài
+## 12. Raw logs quá dài
 
 Các lỗi planner có thể bao gồm các log kỹ thuật. Trong ứng dụng Streamlit, các log này được hiển thị trong các phần có thể mở rộng để giao diện chính vẫn dễ đọc.
