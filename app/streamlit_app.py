@@ -508,6 +508,7 @@ def run_llm_planner(
         "structured_json": structured_json,
         "pddl_text": pddl_text,
         "plan_text": plan_text,
+        "actions": actions,
         "validator_result": validation,
         "runtime": runtime,
         "rendered_plan": rendered_plan,
