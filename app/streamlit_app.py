@@ -776,16 +776,36 @@ def main() -> None:
     task_text = st.text_area(
         "Natural language task",
         key="task_text",
-        height=180,
+        height=140,
     )
 
-    col1, col2 = st.columns(2)
+    # ── Action buttons ────────────────────────────────────────
+    btn_col1, btn_col2, btn_col3 = st.columns([2, 3, 2])
 
-    with col1:
-        run_llm_only_clicked = st.button("Generate Direct Plan", use_container_width=True)
+    with btn_col1:
+        run_llm_only_clicked = st.button(
+            "⚡ LLM-only",
+            use_container_width=True,
+        )
 
-    with col2:
-        run_llm_planner_clicked = st.button("Generate Planner-backed Plan", use_container_width=True)
+    with btn_col2:
+        st.markdown('<div class="run-both-btn">', unsafe_allow_html=True)
+        run_both_clicked = st.button(
+            "🚀 Run Both Methods",
+            use_container_width=True,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with btn_col3:
+        run_llm_planner_clicked = st.button(
+            "🔧 LLM + Planner",
+            use_container_width=True,
+        )
+
+    # Merge button flags
+    if run_both_clicked:
+        run_llm_only_clicked = True
+        run_llm_planner_clicked = True
 
     if run_llm_only_clicked or run_llm_planner_clicked:
         if not task_text.strip():
@@ -820,23 +840,78 @@ def main() -> None:
                     search=search,
                 )
 
-    tab1, tab2 = st.tabs(["Direct LLM Plan", "LLM → JSON → Planner"])
+    # ── Comparison summary (when both results exist) ──────────
+    r_llm = st.session_state.llm_only_result
+    r_planner = st.session_state.llm_planner_result
 
-    with tab1:
-        result = st.session_state.llm_only_result
+    if r_llm is not None and r_planner is not None:
+        _render_comparison_summary(r_llm, r_planner)
 
-        if result is None:
-            st.info("Click **Run LLM-only** to generate a plan directly from the task.")
+    # ── Side-by-side results ──────────────────────────────────
+    left, right = st.columns(2)
+
+    with left:
+        st.markdown(
+            '<div class="comparison-header">'
+            '<span class="comparison-badge llm-only">⚡ LLM-only</span>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+        if r_llm is None:
+            st.info("Click **⚡ LLM-only** or **🚀 Run Both** to generate a direct plan.")
         else:
-            show_result(result)
+            show_result(r_llm)
 
-    with tab2:
-        result = st.session_state.llm_planner_result
+    with right:
+        st.markdown(
+            '<div class="comparison-header">'
+            '<span class="comparison-badge llm-planner">🔧 LLM + Planner</span>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
-        if result is None:
-            st.info("Click **Run LLM + Planner** to convert the task to JSON/PDDL and solve it with pyperplan.")
+        if r_planner is None:
+            st.info("Click **🔧 LLM + Planner** or **🚀 Run Both** to solve via JSON/PDDL.")
         else:
-            show_result(result)
+            show_result(r_planner)
+
+
+def _render_comparison_summary(r_llm: Dict, r_planner: Dict) -> None:
+    """Render a compact comparison banner above the side-by-side results."""
+    v_llm = r_llm["validator_result"]
+    v_plan = r_planner["validator_result"]
+
+    llm_ok = bool(v_llm.get("valid") and v_llm.get("goal_achieved"))
+    plan_ok = bool(v_plan.get("valid") and v_plan.get("goal_achieved"))
+
+    def _badge(ok: bool) -> str:
+        if ok:
+            return '<span class="status-badge success">✅ Valid</span>'
+        return '<span class="status-badge error">❌ Failed</span>'
+
+    st.markdown(
+        '<div style="'
+        "display:flex;align-items:center;justify-content:space-around;"
+        "padding:0.75rem 1rem;margin:1rem 0;"
+        "background:rgba(26,29,41,0.8);"
+        "border:1px solid rgba(255,255,255,0.06);"
+        "border-radius:12px;"
+        '">'
+        '<div style="text-align:center;">'
+        '<div style="font-size:0.7rem;color:#8B92A5;margin-bottom:0.25rem;">LLM-only</div>'
+        f"{_badge(llm_ok)}"
+        f'<div style="font-size:0.7rem;color:#5A6178;margin-top:0.2rem;">{r_llm["runtime"]:.2f}s</div>'
+        "</div>"
+        '<div style="color:#3A3F4D;font-size:1.25rem;">vs</div>'
+        '<div style="text-align:center;">'
+        '<div style="font-size:0.7rem;color:#8B92A5;margin-bottom:0.25rem;">LLM + Planner</div>'
+        f"{_badge(plan_ok)}"
+        f'<div style="font-size:0.7rem;color:#5A6178;margin-top:0.2rem;">{r_planner["runtime"]:.2f}s</div>'
+        "</div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
 
 if __name__ == "__main__":
