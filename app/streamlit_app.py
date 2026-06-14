@@ -140,7 +140,7 @@ EXAMPLES = {
 }
 
 
-LLM_ONLY_PROMPT = """You are solving a Blocks World planning task.
+DEFAULT_LLM_ONLY_PROMPT = """You are solving a Blocks World planning task.
 
 Available actions:
 - pick-up(x)
@@ -156,7 +156,7 @@ Task:
 """
 
 
-LLM_TO_JSON_PROMPT = """Convert the following Blocks World task into JSON.
+DEFAULT_LLM_TO_JSON_PROMPT = """Convert the following Blocks World task into JSON.
 
 Return only valid JSON with this schema:
 {
@@ -206,6 +206,12 @@ def init_session_state() -> None:
 
     if "llm_planner_result" not in st.session_state:
         st.session_state.llm_planner_result = None
+
+    if "llm_only_prompt" not in st.session_state:
+        st.session_state.llm_only_prompt = DEFAULT_LLM_ONLY_PROMPT
+
+    if "llm_to_json_prompt" not in st.session_state:
+        st.session_state.llm_to_json_prompt = DEFAULT_LLM_TO_JSON_PROMPT
 
 
 def set_example(example_name: str) -> None:
@@ -269,7 +275,8 @@ def run_llm_only(
     start_time = time.perf_counter()
 
     problem = make_problem_from_natural_language(natural_language)
-    prompt = LLM_ONLY_PROMPT.replace("{natural_language}", natural_language)
+    prompt_template = st.session_state.get("llm_only_prompt", DEFAULT_LLM_ONLY_PROMPT)
+    prompt = prompt_template.replace("{natural_language}", natural_language)
 
     raw_output = ""
     actions: List[List[str]] = []
@@ -352,7 +359,8 @@ def run_llm_planner(
     start_time = time.perf_counter()
 
     source_problem = make_problem_from_natural_language(natural_language)
-    prompt = LLM_TO_JSON_PROMPT.replace("{natural_language}", natural_language)
+    prompt_template = st.session_state.get("llm_to_json_prompt", DEFAULT_LLM_TO_JSON_PROMPT)
+    prompt = prompt_template.replace("{natural_language}", natural_language)
 
     raw_output = ""
     structured_json: Optional[Dict[str, Any]] = None
@@ -776,6 +784,44 @@ def main() -> None:
                 value="gbf",
                 help="Search algorithm used by pyperplan.",
             )
+
+        st.header("Prompt Templates")
+
+        with st.expander("LLM-only prompt", expanded=False):
+            st.markdown(
+                '<div class="prompt-editor-label">Direct plan prompt</div>',
+                unsafe_allow_html=True,
+            )
+            st.session_state.llm_only_prompt = st.text_area(
+                "LLM-only prompt template",
+                value=st.session_state.llm_only_prompt,
+                height=200,
+                key="_llm_only_prompt_editor",
+                help="Use {natural_language} as placeholder for the task.",
+                label_visibility="collapsed",
+            )
+
+            if st.button("↩ Reset", key="reset_llm_only_prompt"):
+                st.session_state.llm_only_prompt = DEFAULT_LLM_ONLY_PROMPT
+                st.rerun()
+
+        with st.expander("LLM → JSON prompt", expanded=False):
+            st.markdown(
+                '<div class="prompt-editor-label">Structured JSON prompt</div>',
+                unsafe_allow_html=True,
+            )
+            st.session_state.llm_to_json_prompt = st.text_area(
+                "LLM-to-JSON prompt template",
+                value=st.session_state.llm_to_json_prompt,
+                height=300,
+                key="_llm_to_json_prompt_editor",
+                help="Use {natural_language} as placeholder for the task.",
+                label_visibility="collapsed",
+            )
+
+            if st.button("↩ Reset", key="reset_llm_to_json_prompt"):
+                st.session_state.llm_to_json_prompt = DEFAULT_LLM_TO_JSON_PROMPT
+                st.rerun()
 
     task_text = st.text_area(
         "Natural language task",
