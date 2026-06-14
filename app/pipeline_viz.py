@@ -10,19 +10,19 @@ from typing import Any, Dict, List
 # ── Step definitions ──────────────────────────────────────────
 
 LLM_ONLY_STEPS = [
-    {"key": "input", "label": "NL Input", "icon": "📝"},
-    {"key": "llm", "label": "LLM", "icon": "🤖"},
-    {"key": "parse", "label": "Parse", "icon": "🔍"},
-    {"key": "validate", "label": "Validate", "icon": "✅"},
+    {"key": "input", "label": "NL Input", "icon": "1"},
+    {"key": "llm", "label": "LLM", "icon": "2"},
+    {"key": "parse", "label": "Parse", "icon": "3"},
+    {"key": "validate", "label": "Validate", "icon": "4"},
 ]
 
 LLM_PLANNER_STEPS = [
-    {"key": "input", "label": "NL Input", "icon": "📝"},
-    {"key": "llm", "label": "LLM", "icon": "🤖"},
-    {"key": "json", "label": "JSON", "icon": "📋"},
-    {"key": "pddl", "label": "PDDL", "icon": "📄"},
-    {"key": "planner", "label": "Planner", "icon": "⚙️"},
-    {"key": "validate", "label": "Validate", "icon": "✅"},
+    {"key": "input", "label": "NL Input", "icon": "1"},
+    {"key": "llm", "label": "LLM", "icon": "2"},
+    {"key": "json", "label": "JSON", "icon": "3"},
+    {"key": "pddl", "label": "PDDL", "icon": "4"},
+    {"key": "planner", "label": "Planner", "icon": "5"},
+    {"key": "validate", "label": "Validate", "icon": "6"},
 ]
 
 

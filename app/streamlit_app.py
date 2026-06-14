@@ -24,7 +24,7 @@ def load_css() -> None:
 def render_app_header() -> None:
     """Render the styled application header."""
     st.markdown(
-        '<div class="app-title"><h1>🧱 Blocks World LLM Planning</h1></div>',
+        '<div class="app-title"><h1>Blocks World LLM Planning</h1></div>',
         unsafe_allow_html=True,
     )
     st.markdown(
@@ -515,7 +515,7 @@ def run_llm_planner(
     }
 
 def format_bool(value: bool) -> str:
-    return "✅ Yes" if value else "❌ No"
+    return "Yes" if value else "No"
 
 
 def format_plan_steps(plan_text: str) -> str:
@@ -835,21 +835,21 @@ def main() -> None:
 
     with btn_col1:
         run_llm_only_clicked = st.button(
-            "⚡ LLM-only",
+            "LLM-only",
             use_container_width=True,
         )
 
     with btn_col2:
         st.markdown('<div class="run-both-btn">', unsafe_allow_html=True)
         run_both_clicked = st.button(
-            "🚀 Run Both Methods",
+            "Run Both Methods",
             use_container_width=True,
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
     with btn_col3:
         run_llm_planner_clicked = st.button(
-            "🔧 LLM + Planner",
+            "LLM + Planner",
             use_container_width=True,
         )
 
@@ -904,26 +904,26 @@ def main() -> None:
     with left:
         st.markdown(
             '<div class="comparison-header">'
-            '<span class="comparison-badge llm-only">⚡ LLM-only</span>'
+            '<span class="comparison-badge llm-only">LLM-only</span>'
             "</div>",
             unsafe_allow_html=True,
         )
 
         if r_llm is None:
-            st.info("Click **⚡ LLM-only** or **🚀 Run Both** to generate a direct plan.")
+            st.info("Click **LLM-only** or **Run Both** to generate a direct plan.")
         else:
             show_result(r_llm)
 
     with right:
         st.markdown(
             '<div class="comparison-header">'
-            '<span class="comparison-badge llm-planner">🔧 LLM + Planner</span>'
+            '<span class="comparison-badge llm-planner">LLM + Planner</span>'
             "</div>",
             unsafe_allow_html=True,
         )
 
         if r_planner is None:
-            st.info("Click **🔧 LLM + Planner** or **🚀 Run Both** to solve via JSON/PDDL.")
+            st.info("Click **LLM + Planner** or **Run Both** to solve via JSON/PDDL.")
         else:
             show_result(r_planner)
 
@@ -938,8 +938,8 @@ def _render_comparison_summary(r_llm: Dict, r_planner: Dict) -> None:
 
     def _badge(ok: bool) -> str:
         if ok:
-            return '<span class="status-badge success">✅ Valid</span>'
-        return '<span class="status-badge error">❌ Failed</span>'
+            return '<span class="status-badge success">Valid</span>'
+        return '<span class="status-badge error">Failed</span>'
 
     st.markdown(
         '<div style="'

@@ -125,7 +125,7 @@ def _render_hand_html(held: str | None) -> str:
             "border-radius:8px;margin-top:0.6rem;"
             "font-size:0.78rem;color:#8B92A5;"
             "font-family:'Inter',sans-serif;"
-            '">🤚 Hand empty</div>'
+            '">Hand empty</div>'
         )
 
     bg = _color_for(held)
@@ -140,7 +140,7 @@ def _render_hand_html(held: str | None) -> str:
         "border-radius:8px;margin-top:0.6rem;"
         "font-size:0.78rem;color:#A29BFE;"
         "font-family:'Inter',sans-serif;"
-        f'">🤚 Holding '
+        f'">Holding '
         f'<span style="'
         f"display:inline-flex;align-items:center;justify-content:center;"
         f"width:28px;height:22px;border-radius:4px;"
@@ -224,7 +224,7 @@ def render_plan_visual(
                 "text-align:center;padding:0.4rem;margin:0.25rem 0;"
                 "font-family:'Inter',sans-serif;font-size:0.78rem;"
                 "color:#FF6B6B;"
-                f'">❌ Step {idx}: {action_str} — {error}</div>'
+                f'">Step {idx}: {action_str} — {error}</div>'
             )
             parts.append(render_state_html(state, label=f"Step {idx} — ERROR"))
             break
