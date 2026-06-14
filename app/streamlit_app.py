@@ -12,14 +12,43 @@ from dotenv import load_dotenv
 import streamlit as st
 
 
+def load_css() -> None:
+    """Load custom CSS theme from styles.css."""
+    css_path = Path(__file__).parent / "styles.css"
+
+    if css_path.exists():
+        css_text = css_path.read_text(encoding="utf-8")
+        st.markdown(f"<style>{css_text}</style>", unsafe_allow_html=True)
+
+
+def render_app_header() -> None:
+    """Render the styled application header."""
+    st.markdown(
+        '<div class="app-title"><h1>Blocks World LLM Planning</h1></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<p class="app-subtitle">'
+        "So sánh <strong>LLM‑only</strong> và "
+        "<strong>LLM + Symbolic Planner</strong> "
+        "cho bài toán Blocks World"
+        "</p>",
+        unsafe_allow_html=True,
+    )
+
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT_DIR / "src"
+APP_DIR = Path(__file__).resolve().parent
 
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
+
+if str(APP_DIR) not in sys.path:
+    sys.path.insert(0, str(APP_DIR))
 
 
 from llm_client import LLMClient, LLMConfig
@@ -33,6 +62,9 @@ from llm_to_json import (
 )
 from render_plan import render_plan
 from validate_plan import validate_plan
+
+from block_visualizer import render_plan_visual
+from pipeline_viz import pipeline_html_for_result
 
 
 EXAMPLES = {
@@ -108,7 +140,7 @@ EXAMPLES = {
 }
 
 
-LLM_ONLY_PROMPT = """You are solving a Blocks World planning task.
+DEFAULT_LLM_ONLY_PROMPT = """You are solving a Blocks World planning task.
 
 Available actions:
 - pick-up(x)
@@ -124,7 +156,7 @@ Task:
 """
 
 
-LLM_TO_JSON_PROMPT = """Convert the following Blocks World task into JSON.
+DEFAULT_LLM_TO_JSON_PROMPT = """Convert the following Blocks World task into JSON.
 
 Return only valid JSON with this schema:
 {
@@ -174,6 +206,12 @@ def init_session_state() -> None:
 
     if "llm_planner_result" not in st.session_state:
         st.session_state.llm_planner_result = None
+
+    if "llm_only_prompt" not in st.session_state:
+        st.session_state.llm_only_prompt = DEFAULT_LLM_ONLY_PROMPT
+
+    if "llm_to_json_prompt" not in st.session_state:
+        st.session_state.llm_to_json_prompt = DEFAULT_LLM_TO_JSON_PROMPT
 
 
 def set_example(example_name: str) -> None:
@@ -237,7 +275,8 @@ def run_llm_only(
     start_time = time.perf_counter()
 
     problem = make_problem_from_natural_language(natural_language)
-    prompt = LLM_ONLY_PROMPT.replace("{natural_language}", natural_language)
+    prompt_template = st.session_state.get("llm_only_prompt", DEFAULT_LLM_ONLY_PROMPT)
+    prompt = prompt_template.replace("{natural_language}", natural_language)
 
     raw_output = ""
     actions: List[List[str]] = []
@@ -320,7 +359,8 @@ def run_llm_planner(
     start_time = time.perf_counter()
 
     source_problem = make_problem_from_natural_language(natural_language)
-    prompt = LLM_TO_JSON_PROMPT.replace("{natural_language}", natural_language)
+    prompt_template = st.session_state.get("llm_to_json_prompt", DEFAULT_LLM_TO_JSON_PROMPT)
+    prompt = prompt_template.replace("{natural_language}", natural_language)
 
     raw_output = ""
     structured_json: Optional[Dict[str, Any]] = None
@@ -468,13 +508,14 @@ def run_llm_planner(
         "structured_json": structured_json,
         "pddl_text": pddl_text,
         "plan_text": plan_text,
+        "actions": actions,
         "validator_result": validation,
         "runtime": runtime,
         "rendered_plan": rendered_plan,
     }
 
 def format_bool(value: bool) -> str:
-    return "✅ Yes" if value else "❌ No"
+    return "Yes" if value else "No"
 
 
 def format_plan_steps(plan_text: str) -> str:
@@ -572,6 +613,9 @@ def show_result(result: Dict[str, Any]) -> None:
         and validator_result.get("goal_achieved")
     )
 
+    # Pipeline progress indicator
+    st.markdown(pipeline_html_for_result(result), unsafe_allow_html=True)
+
     st.subheader("Result")
 
     if is_success:
@@ -606,7 +650,28 @@ def show_result(result: Dict[str, Any]) -> None:
     st.code(format_plan_steps(result.get("plan_text", "")), language="text")
 
     st.subheader("Step-by-step State")
-    st.code(result.get("rendered_plan", "") or "<no rendered plan>", language="text")
+
+    # Visual block rendering
+    actions = result.get("actions", [])
+    problem = result.get("problem", {})
+
+    if actions and problem:
+        try:
+            visual_html = render_plan_visual(problem, actions)
+            st.markdown(visual_html, unsafe_allow_html=True)
+        except Exception:
+            st.code(
+                result.get("rendered_plan", "") or "<no rendered plan>",
+                language="text",
+            )
+    else:
+        st.info("No plan actions to visualize.")
+
+    with st.expander("ASCII state trace", expanded=False):
+        st.code(
+            result.get("rendered_plan", "") or "<no rendered plan>",
+            language="text",
+        )
 
     if result["method"] == "llm_planner":
         with st.expander("Structured JSON", expanded=False):
@@ -641,13 +706,10 @@ def main() -> None:
         layout="wide",
     )
 
+    load_css()
     init_session_state()
 
-    st.title("Blocks World LLM Planning Demo")
-
-    st.markdown(
-        "Demo so sánh **LLM-only** và **LLM + symbolic planner** cho Blocks World."
-    )
+    render_app_header()
 
     with st.sidebar:
         st.header("Examples")
@@ -724,19 +786,77 @@ def main() -> None:
                 help="Search algorithm used by pyperplan.",
             )
 
+        st.header("Prompt Templates")
+
+        with st.expander("LLM-only prompt", expanded=False):
+            st.markdown(
+                '<div class="prompt-editor-label">Direct plan prompt</div>',
+                unsafe_allow_html=True,
+            )
+            st.session_state.llm_only_prompt = st.text_area(
+                "LLM-only prompt template",
+                value=st.session_state.llm_only_prompt,
+                height=200,
+                key="_llm_only_prompt_editor",
+                help="Use {natural_language} as placeholder for the task.",
+                label_visibility="collapsed",
+            )
+
+            if st.button("↩ Reset", key="reset_llm_only_prompt"):
+                st.session_state.llm_only_prompt = DEFAULT_LLM_ONLY_PROMPT
+                st.rerun()
+
+        with st.expander("LLM → JSON prompt", expanded=False):
+            st.markdown(
+                '<div class="prompt-editor-label">Structured JSON prompt</div>',
+                unsafe_allow_html=True,
+            )
+            st.session_state.llm_to_json_prompt = st.text_area(
+                "LLM-to-JSON prompt template",
+                value=st.session_state.llm_to_json_prompt,
+                height=300,
+                key="_llm_to_json_prompt_editor",
+                help="Use {natural_language} as placeholder for the task.",
+                label_visibility="collapsed",
+            )
+
+            if st.button("↩ Reset", key="reset_llm_to_json_prompt"):
+                st.session_state.llm_to_json_prompt = DEFAULT_LLM_TO_JSON_PROMPT
+                st.rerun()
+
     task_text = st.text_area(
         "Natural language task",
         key="task_text",
-        height=180,
+        height=140,
     )
 
-    col1, col2 = st.columns(2)
+    # ── Action buttons ────────────────────────────────────────
+    btn_col1, btn_col2, btn_col3 = st.columns([2, 3, 2])
 
-    with col1:
-        run_llm_only_clicked = st.button("Generate Direct Plan", use_container_width=True)
+    with btn_col1:
+        run_llm_only_clicked = st.button(
+            "LLM-only",
+            use_container_width=True,
+        )
 
-    with col2:
-        run_llm_planner_clicked = st.button("Generate Planner-backed Plan", use_container_width=True)
+    with btn_col2:
+        st.markdown('<div class="run-both-btn">', unsafe_allow_html=True)
+        run_both_clicked = st.button(
+            "Run Both Methods",
+            use_container_width=True,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with btn_col3:
+        run_llm_planner_clicked = st.button(
+            "LLM + Planner",
+            use_container_width=True,
+        )
+
+    # Merge button flags
+    if run_both_clicked:
+        run_llm_only_clicked = True
+        run_llm_planner_clicked = True
 
     if run_llm_only_clicked or run_llm_planner_clicked:
         if not task_text.strip():
@@ -771,23 +891,78 @@ def main() -> None:
                     search=search,
                 )
 
-    tab1, tab2 = st.tabs(["Direct LLM Plan", "LLM → JSON → Planner"])
+    # ── Comparison summary (when both results exist) ──────────
+    r_llm = st.session_state.llm_only_result
+    r_planner = st.session_state.llm_planner_result
 
-    with tab1:
-        result = st.session_state.llm_only_result
+    if r_llm is not None and r_planner is not None:
+        _render_comparison_summary(r_llm, r_planner)
 
-        if result is None:
-            st.info("Click **Run LLM-only** to generate a plan directly from the task.")
+    # ── Side-by-side results ──────────────────────────────────
+    left, right = st.columns(2)
+
+    with left:
+        st.markdown(
+            '<div class="comparison-header">'
+            '<span class="comparison-badge llm-only">LLM-only</span>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+        if r_llm is None:
+            st.info("Click **LLM-only** or **Run Both** to generate a direct plan.")
         else:
-            show_result(result)
+            show_result(r_llm)
 
-    with tab2:
-        result = st.session_state.llm_planner_result
+    with right:
+        st.markdown(
+            '<div class="comparison-header">'
+            '<span class="comparison-badge llm-planner">LLM + Planner</span>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
-        if result is None:
-            st.info("Click **Run LLM + Planner** to convert the task to JSON/PDDL and solve it with pyperplan.")
+        if r_planner is None:
+            st.info("Click **LLM + Planner** or **Run Both** to solve via JSON/PDDL.")
         else:
-            show_result(result)
+            show_result(r_planner)
+
+
+def _render_comparison_summary(r_llm: Dict, r_planner: Dict) -> None:
+    """Render a compact comparison banner above the side-by-side results."""
+    v_llm = r_llm["validator_result"]
+    v_plan = r_planner["validator_result"]
+
+    llm_ok = bool(v_llm.get("valid") and v_llm.get("goal_achieved"))
+    plan_ok = bool(v_plan.get("valid") and v_plan.get("goal_achieved"))
+
+    def _badge(ok: bool) -> str:
+        if ok:
+            return '<span class="status-badge success">Valid</span>'
+        return '<span class="status-badge error">Failed</span>'
+
+    st.markdown(
+        '<div style="'
+        "display:flex;align-items:center;justify-content:space-around;"
+        "padding:0.75rem 1rem;margin:1rem 0;"
+        "background:rgba(26,29,41,0.8);"
+        "border:1px solid rgba(255,255,255,0.06);"
+        "border-radius:12px;"
+        '">'
+        '<div style="text-align:center;">'
+        '<div style="font-size:0.7rem;color:#8B92A5;margin-bottom:0.25rem;">LLM-only</div>'
+        f"{_badge(llm_ok)}"
+        f'<div style="font-size:0.7rem;color:#5A6178;margin-top:0.2rem;">{r_llm["runtime"]:.2f}s</div>'
+        "</div>"
+        '<div style="color:#3A3F4D;font-size:1.25rem;">vs</div>'
+        '<div style="text-align:center;">'
+        '<div style="font-size:0.7rem;color:#8B92A5;margin-bottom:0.25rem;">LLM + Planner</div>'
+        f"{_badge(plan_ok)}"
+        f'<div style="font-size:0.7rem;color:#5A6178;margin-top:0.2rem;">{r_planner["runtime"]:.2f}s</div>'
+        "</div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
 
 if __name__ == "__main__":
