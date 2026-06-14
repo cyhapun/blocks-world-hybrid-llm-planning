@@ -39,12 +39,16 @@ def render_app_header() -> None:
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT_DIR / "src"
+APP_DIR = Path(__file__).resolve().parent
 
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
+
+if str(APP_DIR) not in sys.path:
+    sys.path.insert(0, str(APP_DIR))
 
 
 from llm_client import LLMClient, LLMConfig
@@ -58,6 +62,8 @@ from llm_to_json import (
 )
 from render_plan import render_plan
 from validate_plan import validate_plan
+
+from block_visualizer import render_plan_visual
 
 
 EXAMPLES = {
@@ -631,7 +637,28 @@ def show_result(result: Dict[str, Any]) -> None:
     st.code(format_plan_steps(result.get("plan_text", "")), language="text")
 
     st.subheader("Step-by-step State")
-    st.code(result.get("rendered_plan", "") or "<no rendered plan>", language="text")
+
+    # Visual block rendering
+    actions = result.get("actions", [])
+    problem = result.get("problem", {})
+
+    if actions and problem:
+        try:
+            visual_html = render_plan_visual(problem, actions)
+            st.markdown(visual_html, unsafe_allow_html=True)
+        except Exception:
+            st.code(
+                result.get("rendered_plan", "") or "<no rendered plan>",
+                language="text",
+            )
+    else:
+        st.info("No plan actions to visualize.")
+
+    with st.expander("ASCII state trace", expanded=False):
+        st.code(
+            result.get("rendered_plan", "") or "<no rendered plan>",
+            language="text",
+        )
 
     if result["method"] == "llm_planner":
         with st.expander("Structured JSON", expanded=False):
