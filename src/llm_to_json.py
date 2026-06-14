@@ -518,7 +518,7 @@ def main() -> None:
 
     parser.add_argument(
         "--prompt",
-        default="src/prompts/llm_to_json_prompt.txt",
+        default="src/prompts/basic/llm_to_json_prompt.txt",
         help="Path to prompt template",
     )
     parser.add_argument(

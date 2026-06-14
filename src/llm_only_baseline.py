@@ -234,7 +234,7 @@ def main() -> None:
 
     parser.add_argument(
         "--prompt",
-        default="src/prompts/llm_only_prompt.txt",
+        default="src/prompts/basic/llm_only_prompt.txt",
         help="Path to prompt template",
     )
     parser.add_argument(
