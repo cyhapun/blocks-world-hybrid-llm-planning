@@ -12,6 +12,31 @@ from dotenv import load_dotenv
 import streamlit as st
 
 
+def load_css() -> None:
+    """Load custom CSS theme from styles.css."""
+    css_path = Path(__file__).parent / "styles.css"
+
+    if css_path.exists():
+        css_text = css_path.read_text(encoding="utf-8")
+        st.markdown(f"<style>{css_text}</style>", unsafe_allow_html=True)
+
+
+def render_app_header() -> None:
+    """Render the styled application header."""
+    st.markdown(
+        '<div class="app-title"><h1>🧱 Blocks World LLM Planning</h1></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<p class="app-subtitle">'
+        "So sánh <strong>LLM‑only</strong> và "
+        "<strong>LLM + Symbolic Planner</strong> "
+        "cho bài toán Blocks World"
+        "</p>",
+        unsafe_allow_html=True,
+    )
+
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT_DIR / "src"
 
@@ -641,13 +666,10 @@ def main() -> None:
         layout="wide",
     )
 
+    load_css()
     init_session_state()
 
-    st.title("Blocks World LLM Planning Demo")
-
-    st.markdown(
-        "Demo so sánh **LLM-only** và **LLM + symbolic planner** cho Blocks World."
-    )
+    render_app_header()
 
     with st.sidebar:
         st.header("Examples")
