@@ -87,18 +87,15 @@ Với thiết kế factorial (model × prompt × method), ta có thể phân tí
 
 ## Streamlit Demo
 
-Ứng dụng Streamlit cung cấp một giao diện tương tác với:
+Ứng dụng Streamlit được thiết kế với giao diện hiện đại (Dark theme), cung cấp một môi trường tương tác trực quan:
 
-- Nhập tác vụ bằng ngôn ngữ tự nhiên
-- Các tác vụ ví dụ
-- Thực thi LLM-only
-- Thực thi LLM + planner
-- Đầu ra LLM thô
-- JSON có cấu trúc
-- PDDL được tạo ra
-- Kế hoạch cuối cùng
-- Kết quả xác thực
-- Hiển thị trạng thái từng bước
+- Bố cục Side-by-side cho phép đối chiếu trực tiếp giữa 2 phương pháp
+- Thanh tiến trình ngang (Pipeline Progress Visualization) giúp nhận diện lỗi nằm ở khâu nào
+- Trình hiển thị trạng thái bằng hình khối (Visual Block Rendering) thay cho chữ ASCII khô khan
+- Mục "Prompt Templates" cho phép người thuyết trình sửa prompt ngay tại chỗ để thử nghiệm
+- Tùy chọn chạy song song cả 2 phương pháp cùng lúc (Run Both Methods)
+- Hiển thị đầu ra LLM thô, JSON có cấu trúc, và PDDL được sinh ra
+- Hiển thị báo cáo so sánh (Comparison summary) gồm runtime và độ hợp lệ
 
 Chạy:
 
@@ -108,13 +105,21 @@ streamlit run app/streamlit_app.py
 
 ## Demo Storyline
 
-Luồng trình bày được đề xuất:
+Luồng trình bày được đề xuất dựa trên giao diện Side-by-side mới:
 
-1. Tải một ví dụ dễ.
-2. Chạy LLM-only.
-3. Hiển thị kế hoạch được tạo ra và kết quả xác thực.
-4. Chạy LLM + planner.
-5. Hiển thị JSON, PDDL, kế hoạch của planner, và kết quả xác thực.
-6. So sánh nơi mỗi phương pháp thành công hoặc thất bại.
-7. Mở notebook `notebook/analysis.ipynb` để trình bày phân tích đa mô hình.
-8. Thảo luận về ảnh hưởng của prompt variant đến kết quả.
+1. **Phân tích Bài toán dễ**:
+   - Tải "Example 1: Easy".
+   - Chạy **Run Both Methods**.
+   - Khoe tính năng Visual Block Rendering và thanh trạng thái tiến trình xanh báo hiệu cả 2 đều Valid.
+2. **Khai thác Điểm yếu của LLM**:
+   - Tải "Example 3: Hard".
+   - Chạy **Run Both Methods**.
+   - Phân tích bên LLM-only: Kế hoạch sẽ hiển thị thẻ lỗi đỏ (Failed). Kéo xuống phần Visualizer để xem bước nào bị lỗi "precondition violation" (ví dụ: bốc khối đang bị đè).
+   - Phân tích bên LLM + Planner: Hiển thị thẻ xanh (Valid). Mở phần JSON và PDDL để xem hệ thống trích xuất cấu trúc chuẩn xác như thế nào để pyperplan tính toán.
+3. **Thử nghiệm Động**:
+   - Mở phần **Prompt Templates** ở cột bên trái.
+   - Thay đổi prompt của LLM-to-JSON để yêu cầu mô hình phản hồi sai định dạng (vd: bắt giải thích).
+   - Chạy lại để xem Pipeline Progress báo lỗi đỏ ngay tại bước "Parse JSON" thay vì "Validate", chứng minh khả năng debug trực quan.
+4. **Đánh giá Thống kê**:
+   - Mở notebook `notebook/analysis.ipynb` để trình bày phân tích đa mô hình (funnel analysis, success rate heatmap).
+   - Thảo luận về ảnh hưởng của prompt variant đến kết quả chung.

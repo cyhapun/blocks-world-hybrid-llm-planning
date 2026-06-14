@@ -71,6 +71,8 @@ Các thành phần chính:
 ├── requirements.txt
 ├── config.yaml
 ├── .env.example
+├── .streamlit/
+│   └── config.toml
 ├── data/
 │   ├── blocks_world_easy.jsonl
 │   ├── blocks_world_medium.jsonl
@@ -124,7 +126,10 @@ Các thành phần chính:
 │   ├── test_evaluate_metrics.py
 │   └── test_viz_analysis.py
 └── app/
-    └── streamlit_app.py
+    ├── block_visualizer.py
+    ├── pipeline_viz.py
+    ├── streamlit_app.py
+    └── styles.css
 ```
 
 ## 3. Thiết lập môi trường
@@ -389,17 +394,16 @@ python src/render_plan.py --problem-id bw_easy_001
 streamlit run app/streamlit_app.py
 ```
 
-Ứng dụng hỗ trợ:
+Ứng dụng đã được nâng cấp giao diện toàn diện với các tính năng:
 
-- Nhập nhiệm vụ bằng ngôn ngữ tự nhiên
-- Các nhiệm vụ ví dụ
-- Lập kế hoạch LLM-only
-- Pipeline LLM + planner
-- Hiển thị raw LLM output
-- Hiển thị JSON có cấu trúc và PDDL được tạo
-- Hiển thị plan
-- Hiển thị kết quả validator
-- Render trạng thái Blocks World từng bước
+- Bố cục so sánh trực tiếp Side-by-side giữa LLM-only và LLM + planner
+- Nút **Run Both Methods** cho phép chạy song song 2 pipeline
+- Thanh hiển thị tiến trình trực quan (Pipeline Progress Visualization)
+- Trình biên tập cấu trúc prompt ngay trong UI (Editable Prompts)
+- Trình hiển thị trạng thái khối hình học trực quan (Visual Block Rendering)
+- Nhập nhiệm vụ bằng ngôn ngữ tự nhiên hoặc chọn từ các bài toán mẫu
+- Hiển thị raw LLM output, JSON có cấu trúc và PDDL được tạo
+- Hiển thị kết quả xác thực từng bước
 
 Ứng dụng đọc credentials từ `.env`.
 
