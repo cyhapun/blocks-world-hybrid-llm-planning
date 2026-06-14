@@ -64,6 +64,7 @@ from render_plan import render_plan
 from validate_plan import validate_plan
 
 from block_visualizer import render_plan_visual
+from pipeline_viz import pipeline_html_for_result
 
 
 EXAMPLES = {
@@ -602,6 +603,9 @@ def show_result(result: Dict[str, Any]) -> None:
         validator_result.get("valid")
         and validator_result.get("goal_achieved")
     )
+
+    # Pipeline progress indicator
+    st.markdown(pipeline_html_for_result(result), unsafe_allow_html=True)
 
     st.subheader("Result")
 
